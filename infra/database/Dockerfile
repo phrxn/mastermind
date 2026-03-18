@@ -1,0 +1,5 @@
+FROM mariadb:11
+
+COPY init.sql /docker-entrypoint-initdb.d/
+
+LABEL project=mastermind

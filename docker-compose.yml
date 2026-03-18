@@ -1,0 +1,18 @@
+services:
+  mariadb:
+    build:
+      context: ./infra/database
+    image: mastermind-mariadb
+    container_name: mastermind-db
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+    networks:
+      - mastermind
+
+networks:
+  mastermind:
+    driver: bridge
+    name: mastermind
