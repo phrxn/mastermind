@@ -3,3 +3,5 @@ p.txt
 specs.txt
 a.odt
 .~lock.a.odt#
+
+.env.local
