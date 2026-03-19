@@ -4,13 +4,21 @@ import org.springframework.stereotype.Component;
 
 import com.quazzom.mastermind.dto.RegisterRequest;
 import com.quazzom.mastermind.exception.InvalidUserDataException;
+import com.quazzom.mastermind.utils.MessageDefaultForPropertiesJSON;
 
 @Component
 public class UserValidator {
 
+	private MessageDefaultForPropertiesJSON messageDefaultForPropertiesJSON = new MessageDefaultForPropertiesJSON();
+
+	public UserValidator() {
+		this.messageDefaultForPropertiesJSON = new MessageDefaultForPropertiesJSON();
+	}
+
 	public void validateRegister(RegisterRequest r) {
 
 		isNameValid(r);
+		isEmailValid(r);
 		isNicknameValid(r);
 		isAgeValid(r);
 		isPasswordValid(r);
@@ -19,7 +27,8 @@ public class UserValidator {
 
 	public void isNameValid(RegisterRequest r) {
 		if (r.getName() == null) {
-			throw new InvalidUserDataException("A propriedade 'nome' deve existir.");
+			throw new InvalidUserDataException(
+					messageDefaultForPropertiesJSON.createMessageForPropertyThatDoesNotExist("name"));
 		}
 
 		if (!r.getName().matches("^[A-Za-z ]{1,60}$")) {
@@ -28,20 +37,45 @@ public class UserValidator {
 		}
 	}
 
-	public void isNicknameValid(RegisterRequest r) {
-		if (r.getNickname() == null) {
-			throw new InvalidUserDataException("A propriedade 'nickname' deve existir.");
+	public void isEmailValid(RegisterRequest r) {
+		if (r.getEmail() == null) {
+			throw new InvalidUserDataException(
+					messageDefaultForPropertiesJSON.createMessageForPropertyThatDoesNotExist("email"));
 		}
 
-		if (!r.getNickname().matches("^[a-z][a-z]{0,19}$")) {
+		String email = r.getEmail().trim();
+
+		if (email.isEmpty()) {
+			throw new InvalidUserDataException("A propriedade 'email' não pode ser vazia.");
+		}
+
+		if (email.length() > 50) {
+			throw new InvalidUserDataException("O email deve ter no máximo 50 caracteres");
+		}
+
+		if (!email.matches("^[A-Za-z]+@[A-Za-z0-9.-]*[A-Za-z]\\.[A-Za-z][A-Za-z0-9.-]*$")) {
 			throw new InvalidUserDataException(
-					"O nickname deve conter apenas letras minúsculas, com no máximo 20 caracteres");
+					"O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)");
+		}
+
+	}
+
+	public void isNicknameValid(RegisterRequest r) {
+		if (r.getNickname() == null) {
+			throw new InvalidUserDataException(
+					messageDefaultForPropertiesJSON.createMessageForPropertyThatDoesNotExist("nickname"));
+		}
+
+		if (!r.getNickname().matches("^[a-z][a-z0-9]{3,19}$")) {
+			throw new InvalidUserDataException(
+					"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres");
 		}
 	}
 
-	public void isAgeValid(RegisterRequest r){
-		if (r.getAge() == null){
-			throw new InvalidUserDataException("A propriedade 'age' deve existir.");
+	public void isAgeValid(RegisterRequest r) {
+		if (r.getAge() == null) {
+			throw new InvalidUserDataException(
+					messageDefaultForPropertiesJSON.createMessageForPropertyThatDoesNotExist("age"));
 		}
 
 		if (r.getAge() < 1 || r.getAge() > 120) {
@@ -49,18 +83,23 @@ public class UserValidator {
 		}
 	}
 
-	public void isPasswordValid(RegisterRequest r){
-		if (r.getPassword() == null){
-			throw new InvalidUserDataException("A propriedade 'password' deve existir.");
+	public void isPasswordValid(RegisterRequest r) {
+		if (r.getPassword() == null) {
+			throw new InvalidUserDataException(
+					messageDefaultForPropertiesJSON.createMessageForPropertyThatDoesNotExist("password"));
 		}
 
-		if (r.getPassword().length() < 6 || r.getPassword().length() > 16) {
-			throw new InvalidUserDataException("A senha deve ter entre 6 e 16 caracteres");
+		if (r.getPassword().length() < 6 || r.getPassword().length() > 20) {
+			throw new InvalidUserDataException("A senha deve ter entre 6 e 20 caracteres");
 		}
 
 		if (!r.getPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%¨_\\-]).*$")) {
 			throw new InvalidUserDataException(
 					"A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -");
 		}
+	}
+
+	public void setMessageDefaultForPropertiesJSON(MessageDefaultForPropertiesJSON messageDefaultForPropertiesJSON) {
+		this.messageDefaultForPropertiesJSON = messageDefaultForPropertiesJSON;
 	}
 }

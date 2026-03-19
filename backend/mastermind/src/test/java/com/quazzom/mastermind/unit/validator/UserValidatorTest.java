@@ -13,106 +13,448 @@ import com.quazzom.mastermind.validator.UserValidator;
 
 class UserValidatorTest {
 
-    private UserValidator userValidator;
+	private UserValidator userValidator;
 
-    @BeforeEach
-    void setUp() {
-        userValidator = new UserValidator();
-    }
+	@BeforeEach
+	void setUp() {
+		userValidator = new UserValidator();
+	}
 
-    @Test
-    void validateRegisterShouldPassWithValidData() {
-        RegisterRequest request = validRequest();
+	@Test
+	void validateRegisterShouldPassWithValidData() {
+		RegisterRequest request = validRequest();
 
-        assertDoesNotThrow(() -> userValidator.validateRegister(request));
-    }
+		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+	}
 
-    @Test
-    void validateRegisterShouldFailWhenNameIsNull() {
-        RegisterRequest request = validRequest();
-        request.setName(null);
+	// ===== Name =====
+	@Test
+	void validateRegisterShouldFailWhenNameIsNull() {
+		RegisterRequest request = validRequest();
+		request.setName(null);
 
-        InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-                () -> userValidator.validateRegister(request));
-        assertEquals("A propriedade 'nome' deve existir.", exception.getMessage());
-    }
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("A propriedade 'name' deve existir.", exception.getMessage());
+	}
 
-    @Test
-    void validateRegisterShouldFailWhenNicknameIsInvalid() {
-        RegisterRequest request = validRequest();
-        request.setNickname("NickMaiusculo");
+	@Test
+	void validateRegisterShouldFailWhenNameContainsNumber() {
+		RegisterRequest request = validRequest();
+		request.setName("Maria1 Silva");
 
-        InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-            () -> userValidator.validateRegister(request));
-        assertEquals("O nickname deve conter apenas letras minúsculas, com no máximo 20 caracteres",
-            exception.getMessage());
-    }
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("O nome deve conter apenas letras e espaços, com no máximo 60 caracteres", exception.getMessage());
+	}
 
-    @Test
-    void validateRegisterShouldFailWhenAgeIsOutOfRange() {
-        RegisterRequest request = validRequest();
-        request.setAge(0);
+	@Test
+	void validateRegisterShouldFailWhenNameContainsSpecialChar() {
+		RegisterRequest request = validRequest();
+		request.setName("Maria @Silva");
 
-        InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-                () -> userValidator.validateRegister(request));
-        assertEquals("A idade deve ser um número entre 1 e 120", exception.getMessage());
-    }
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("O nome deve conter apenas letras e espaços, com no máximo 60 caracteres", exception.getMessage());
+	}
 
-    @Test
-    void validateRegisterShouldFailWhenPasswordLacksUppercase() {
-        RegisterRequest request = validRequest();
-        request.setPassword("abc123!");
+	@Test
+	void validateRegisterShouldFailWhenNameHasMoreThanSixtyChars() {
+		RegisterRequest request = validRequest();
+		request.setName("ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHI");
 
-        InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-            () -> userValidator.validateRegister(request));
-        assertEquals(
-            "A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
-            exception.getMessage());
-    }
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("O nome deve conter apenas letras e espaços, com no máximo 60 caracteres", exception.getMessage());
+	}
 
-    @Test
-    void validateRegisterShouldFailWhenPasswordLacksLowercase() {
-        RegisterRequest request = validRequest();
-        request.setPassword("ABC123!");
+	// ===== Email =====
+	@Test
+	void validateRegisterShouldFailWhenEmailIsNull() {
+		RegisterRequest request = validRequest();
+		request.setEmail(null);
 
-        InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-            () -> userValidator.validateRegister(request));
-        assertEquals(
-            "A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
-            exception.getMessage());
-    }
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("A propriedade 'email' deve existir.", exception.getMessage());
+	}
 
-    @Test
-    void validateRegisterShouldFailWhenPasswordLacksNumber() {
-        RegisterRequest request = validRequest();
-        request.setPassword("Abcdef!");
+	@Test
+	void validateRegisterShouldFailWhenEmailIsEmpty() {
+		RegisterRequest request = validRequest();
+		request.setEmail("");
 
-        InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-            () -> userValidator.validateRegister(request));
-        assertEquals(
-            "A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
-            exception.getMessage());
-    }
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("A propriedade 'email' não pode ser vazia.", exception.getMessage());
+	}
 
-    @Test
-    void validateRegisterShouldFailWhenPasswordLacksSpecialChar() {
-        RegisterRequest request = validRequest();
-        request.setPassword("Abc1234");
+	@Test
+	void validateRegisterShouldFailWhenEmailHasMoreThanFiftyChars() {
+		RegisterRequest request = validRequest();
+		request.setEmail("abcdefghijklmnopqrst@abcdefghijklmnopqrst.abcdefghi");
 
-        InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-            () -> userValidator.validateRegister(request));
-        assertEquals(
-            "A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
-            exception.getMessage());
-    }
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("O email deve ter no máximo 50 caracteres", exception.getMessage());
+	}
 
-    private RegisterRequest validRequest() {
-        RegisterRequest request = new RegisterRequest();
-        request.setName("Maria Silva");
-        request.setEmail("maria@teste.com");
-        request.setNickname("maria");
-        request.setAge(25);
-        request.setPassword("Abc123!");
-        return request;
-    }
+	@Test
+	void validateRegisterShouldFailWhenEmailHasNoAtSymbol() {
+		RegisterRequest request = validRequest();
+		request.setEmail("mariateste.com");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)", exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenEmailHasNoDotAfterAt() {
+		RegisterRequest request = validRequest();
+		request.setEmail("maria@testecom");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)", exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenEmailEndsWithDot() {
+		RegisterRequest request = validRequest();
+		request.setEmail("maria@testecom.");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)", exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldPassWhenEmailHasMinimumFormat() {
+		RegisterRequest request = validRequest();
+		request.setEmail("a@b.c");
+
+		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+	}
+
+	@Test
+	void validateRegisterShouldPassWhenEmailHasSubdomainAndDomain() {
+		RegisterRequest request = validRequest();
+		request.setEmail("user@subdomain.domain.com");
+
+		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+	}
+
+	@Test
+	void validateRegisterShouldPassWhenEmailHasFiftyChars() {
+		RegisterRequest request = validRequest();
+		request.setEmail("abcdefghijklmnopqrst@abcdefghijklmnopqrst.abcdefgh");
+
+		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+	}
+
+	// ===== Nickname =====
+	@Test
+	void validateRegisterShouldFailWhenNicknameIsNull() {
+		RegisterRequest request = validRequest();
+		request.setNickname(null);
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("A propriedade 'nickname' deve existir.", exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenNicknameIsEmpty() {
+		RegisterRequest request = validRequest();
+		request.setNickname("");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals(
+				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
+				exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenNicknameHasLessThanFourChars() {
+		RegisterRequest request = validRequest();
+		request.setNickname("abc");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals(
+				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
+				exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenNicknameStartsWithNumber() {
+		RegisterRequest request = validRequest();
+		request.setNickname("1maria");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals(
+				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
+				exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenNicknameStartsWithSpace() {
+		RegisterRequest request = validRequest();
+		request.setNickname(" maria");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals(
+				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
+				exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenNicknameContainsUppercase() {
+		RegisterRequest request = validRequest();
+		request.setNickname("mariaSilva");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals(
+				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
+				exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenNicknameContainsSpace() {
+		RegisterRequest request = validRequest();
+		request.setNickname("maria silva");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals(
+				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
+				exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenNicknameContainsSpecialChar() {
+		RegisterRequest request = validRequest();
+		request.setNickname("maria_");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals(
+				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
+				exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenNicknameHasMoreThanTwentyChars() {
+		RegisterRequest request = validRequest();
+		request.setNickname("abcdefghijklmnopqrstu");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals(
+				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
+				exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldPassWhenNicknameHasNumbers() {
+		RegisterRequest request = validRequest();
+		request.setNickname("maria123");
+
+		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+	}
+
+	@Test
+	void validateRegisterShouldPassWhenNicknameHasMinimumLength() {
+		RegisterRequest request = validRequest();
+		request.setNickname("a1b2");
+
+		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+	}
+
+	@Test
+	void validateRegisterShouldPassWhenNicknameHasTwentyChars() {
+		RegisterRequest request = validRequest();
+		request.setNickname("a1b2c3d4e5f6g7h8i9j");
+
+		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+	}
+
+	// ===== Age =====
+	@Test
+	void validateRegisterShouldFailWhenAgeIsNull() {
+		RegisterRequest request = validRequest();
+		request.setAge(null);
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("A propriedade 'age' deve existir.", exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenAgeIsOutOfRange() {
+		RegisterRequest request = validRequest();
+		request.setAge(0);
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("A idade deve ser um número entre 1 e 120", exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenAgeIsGreaterThanOneHundredTwenty() {
+		RegisterRequest request = validRequest();
+		request.setAge(121);
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("A idade deve ser um número entre 1 e 120", exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldPassWhenAgeIsLowerBoundary() {
+		RegisterRequest request = validRequest();
+		request.setAge(1);
+
+		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+	}
+
+	@Test
+	void validateRegisterShouldPassWhenAgeIsUpperBoundary() {
+		RegisterRequest request = validRequest();
+		request.setAge(120);
+
+		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+	}
+
+	// ===== Password =====
+	@Test
+	void validateRegisterShouldFailWhenPasswordIsNull() {
+		RegisterRequest request = validRequest();
+		request.setPassword(null);
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("A propriedade 'password' deve existir.", exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenPasswordIsEmpty() {
+		RegisterRequest request = validRequest();
+		request.setPassword("");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("A senha deve ter entre 6 e 20 caracteres", exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenPasswordLengthIsTooShort() {
+		RegisterRequest request = validRequest();
+		request.setPassword("Ab1!");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("A senha deve ter entre 6 e 20 caracteres", exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenPasswordLengthIsTooLong() {
+		RegisterRequest request = validRequest();
+		request.setPassword("AbcdefghijK1234!mnopq");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals("A senha deve ter entre 6 e 20 caracteres", exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenPasswordLacksUppercase() {
+		RegisterRequest request = validRequest();
+		request.setPassword("abc123!");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals(
+				"A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
+				exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenPasswordLacksLowercase() {
+		RegisterRequest request = validRequest();
+		request.setPassword("ABC123!");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals(
+				"A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
+				exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenPasswordLacksNumber() {
+		RegisterRequest request = validRequest();
+		request.setPassword("Abcdef!");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals(
+				"A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
+				exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenPasswordLacksSpecialChar() {
+		RegisterRequest request = validRequest();
+		request.setPassword("Abc1234");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals(
+				"A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
+				exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenPasswordHasNotAllowedSpecialChar() {
+		RegisterRequest request = validRequest();
+		request.setPassword("Abc123*");
+
+		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
+				() -> userValidator.validateRegister(request));
+		assertEquals(
+				"A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
+				exception.getMessage());
+	}
+
+	@Test
+	void validateRegisterShouldPassWhenPasswordHasMinimumLength() {
+		RegisterRequest request = validRequest();
+		request.setPassword("Ab1!cd");
+
+		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+	}
+
+	@Test
+	void validateRegisterShouldPassWhenPasswordHasMaximumLength() {
+		RegisterRequest request = validRequest();
+		request.setPassword("AbcdefghijK1234!mnop");
+
+		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+	}
+
+	private RegisterRequest validRequest() {
+		RegisterRequest request = new RegisterRequest();
+		request.setName("Maria Silva");
+		request.setEmail("maria@teste.com");
+		request.setNickname("maria");
+		request.setAge(25);
+		request.setPassword("Abc123!");
+		return request;
+	}
 }
