@@ -1,7 +1,7 @@
 package com.quazzom.mastermind.exception;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -9,36 +9,38 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ApiException.class)
-    public ResponseEntity<?> handleApiException(ApiException ex) {
+	@ExceptionHandler(ApiException.class)
+	public ResponseEntity<?> handleApiException(ApiException ex) {
 
-        return ResponseEntity
-                .status(ex.getStatus())
-                .body(Map.of(
-                        "error", ex.getMessage(),
-                        "status", ex.getStatus()
-                ));
-    }
+		return ResponseEntity
+				.status(ex.getStatus())
+				.body(Map.of(
+						"error", ex.getMessage(),
+						"status", ex.getStatus()));
+	}
 
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<?> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<?> handleGenericException(Exception ex) {
 
-        return ResponseEntity
-                .status(405)
-                .body(Map.of(
-                        "error", "Method not allowed",
-                        "status", 405
-                ));
-    }
+		if (ex instanceof ErrorResponse errorResponse) {
+			int status = errorResponse.getStatusCode().value();
+			String errorMessage = errorResponse.getBody().getDetail();
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGenericException(Exception ex) {
+			if (errorMessage == null || errorMessage.isBlank()) {
+				errorMessage = "Request failed";
+			}
 
-        return ResponseEntity
-                .status(500)
-                .body(Map.of(
-                        "error", "Internal server error",
-                        "status", 500
-                ));
-    }
+			return ResponseEntity
+					.status(status)
+					.body(Map.of(
+							"error", errorMessage,
+							"status", status));
+		}
+
+		return ResponseEntity
+				.status(500)
+				.body(Map.of(
+						"error", "Internal server error",
+						"status", 500));
+	}
 }
