@@ -7,24 +7,29 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.quazzom.mastermind.businessrules.UserBusinessRule;
 import com.quazzom.mastermind.dto.RegisterRequest;
-import com.quazzom.mastermind.exception.InvalidUserDataException;
-import com.quazzom.mastermind.validator.UserValidator;
+import com.quazzom.mastermind.exception.RequestInvalidPropertyValueException;
+import com.quazzom.mastermind.exception.RequestPropertyNotFoundException;
+import com.quazzom.mastermind.utils.MessageDefaultForPropertiesJSON;
+import com.quazzom.mastermind.validator.RegisterRequestValidator;
 
-class UserValidatorTest {
+class RegisterRequestValidatorTest {
 
-	private UserValidator userValidator;
+	private RegisterRequestValidator userValidator;
 
 	@BeforeEach
 	void setUp() {
-		userValidator = new UserValidator();
+		UserBusinessRule userBusinessRule = new UserBusinessRule("abc", "a@a.a", "abcdef", 1, "Abc@1224");
+		userBusinessRule.setMessageDefaultForPropertiesJSON(new MessageDefaultForPropertiesJSON());
+		userValidator = new RegisterRequestValidator(userBusinessRule);
 	}
 
 	@Test
 	void validateRegisterShouldPassWithValidData() {
 		RegisterRequest request = validRequest();
 
-		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+		assertDoesNotThrow(() -> userValidator.validateRequestBody(request));
 	}
 
 	// ===== Name =====
@@ -33,8 +38,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setName(null);
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestPropertyNotFoundException exception = assertThrows(RequestPropertyNotFoundException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("A propriedade 'name' deve existir.", exception.getMessage());
 	}
 
@@ -43,8 +48,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setName("Maria1 Silva");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("O nome deve conter apenas letras e espaços, com no máximo 60 caracteres", exception.getMessage());
 	}
 
@@ -53,8 +58,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setName("Maria @Silva");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("O nome deve conter apenas letras e espaços, com no máximo 60 caracteres", exception.getMessage());
 	}
 
@@ -63,8 +68,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setName("ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHI");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("O nome deve conter apenas letras e espaços, com no máximo 60 caracteres", exception.getMessage());
 	}
 
@@ -74,8 +79,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setEmail(null);
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestPropertyNotFoundException exception = assertThrows(RequestPropertyNotFoundException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("A propriedade 'email' deve existir.", exception.getMessage());
 	}
 
@@ -84,8 +89,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setEmail("");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("A propriedade 'email' não pode ser vazia.", exception.getMessage());
 	}
 
@@ -94,8 +99,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setEmail("abcdefghijklmnopqrst@abcdefghijklmnopqrst.abcdefghi");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("O email deve ter no máximo 50 caracteres", exception.getMessage());
 	}
 
@@ -104,8 +109,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setEmail("mariateste.com");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)", exception.getMessage());
 	}
 
@@ -114,8 +119,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setEmail("maria@testecom");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)", exception.getMessage());
 	}
 
@@ -124,8 +129,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setEmail("maria@testecom.");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)", exception.getMessage());
 	}
 
@@ -134,7 +139,7 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setEmail("a@b.c");
 
-		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+		assertDoesNotThrow(() -> userValidator.validateRequestBody(request));
 	}
 
 	@Test
@@ -142,7 +147,7 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setEmail("user@subdomain.domain.com");
 
-		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+		assertDoesNotThrow(() -> userValidator.validateRequestBody(request));
 	}
 
 	@Test
@@ -150,7 +155,7 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setEmail("abcdefghijklmnopqrst@abcdefghijklmnopqrst.abcdefgh");
 
-		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+		assertDoesNotThrow(() -> userValidator.validateRequestBody(request));
 	}
 
 	// ===== Nickname =====
@@ -159,8 +164,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setNickname(null);
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestPropertyNotFoundException exception = assertThrows(RequestPropertyNotFoundException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("A propriedade 'nickname' deve existir.", exception.getMessage());
 	}
 
@@ -169,8 +174,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setNickname("");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals(
 				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
 				exception.getMessage());
@@ -181,8 +186,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setNickname("abc");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals(
 				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
 				exception.getMessage());
@@ -193,8 +198,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setNickname("1maria");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals(
 				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
 				exception.getMessage());
@@ -205,8 +210,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setNickname(" maria");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals(
 				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
 				exception.getMessage());
@@ -217,8 +222,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setNickname("mariaSilva");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals(
 				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
 				exception.getMessage());
@@ -229,8 +234,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setNickname("maria silva");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals(
 				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
 				exception.getMessage());
@@ -241,8 +246,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setNickname("maria_");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals(
 				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
 				exception.getMessage());
@@ -253,8 +258,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setNickname("abcdefghijklmnopqrstu");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals(
 				"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres",
 				exception.getMessage());
@@ -265,7 +270,7 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setNickname("maria123");
 
-		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+		assertDoesNotThrow(() -> userValidator.validateRequestBody(request));
 	}
 
 	@Test
@@ -273,7 +278,7 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setNickname("a1b2");
 
-		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+		assertDoesNotThrow(() -> userValidator.validateRequestBody(request));
 	}
 
 	@Test
@@ -281,7 +286,7 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setNickname("a1b2c3d4e5f6g7h8i9j");
 
-		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+		assertDoesNotThrow(() -> userValidator.validateRequestBody(request));
 	}
 
 	// ===== Age =====
@@ -290,8 +295,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setAge(null);
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestPropertyNotFoundException exception = assertThrows(RequestPropertyNotFoundException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("A propriedade 'age' deve existir.", exception.getMessage());
 	}
 
@@ -300,8 +305,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setAge(0);
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("A idade deve ser um número entre 1 e 120", exception.getMessage());
 	}
 
@@ -310,8 +315,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setAge(121);
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("A idade deve ser um número entre 1 e 120", exception.getMessage());
 	}
 
@@ -320,7 +325,7 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setAge(1);
 
-		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+		assertDoesNotThrow(() -> userValidator.validateRequestBody(request));
 	}
 
 	@Test
@@ -328,7 +333,7 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setAge(120);
 
-		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+		assertDoesNotThrow(() -> userValidator.validateRequestBody(request));
 	}
 
 	// ===== Password =====
@@ -337,8 +342,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setPassword(null);
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestPropertyNotFoundException exception = assertThrows(RequestPropertyNotFoundException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("A propriedade 'password' deve existir.", exception.getMessage());
 	}
 
@@ -347,8 +352,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setPassword("");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("A senha deve ter entre 6 e 20 caracteres", exception.getMessage());
 	}
 
@@ -357,8 +362,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setPassword("Ab1!");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("A senha deve ter entre 6 e 20 caracteres", exception.getMessage());
 	}
 
@@ -367,8 +372,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setPassword("AbcdefghijK1234!mnopq");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals("A senha deve ter entre 6 e 20 caracteres", exception.getMessage());
 	}
 
@@ -377,8 +382,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setPassword("abc123!");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals(
 				"A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
 				exception.getMessage());
@@ -389,8 +394,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setPassword("ABC123!");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals(
 				"A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
 				exception.getMessage());
@@ -401,8 +406,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setPassword("Abcdef!");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals(
 				"A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
 				exception.getMessage());
@@ -413,8 +418,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setPassword("Abc1234");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals(
 				"A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
 				exception.getMessage());
@@ -425,8 +430,8 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setPassword("Abc123*");
 
-		InvalidUserDataException exception = assertThrows(InvalidUserDataException.class,
-				() -> userValidator.validateRegister(request));
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
 		assertEquals(
 				"A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
 				exception.getMessage());
@@ -437,7 +442,7 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setPassword("Ab1!cd");
 
-		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+		assertDoesNotThrow(() -> userValidator.validateRequestBody(request));
 	}
 
 	@Test
@@ -445,7 +450,7 @@ class UserValidatorTest {
 		RegisterRequest request = validRequest();
 		request.setPassword("AbcdefghijK1234!mnop");
 
-		assertDoesNotThrow(() -> userValidator.validateRegister(request));
+		assertDoesNotThrow(() -> userValidator.validateRequestBody(request));
 	}
 
 	private RegisterRequest validRequest() {
