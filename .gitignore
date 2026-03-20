@@ -5,3 +5,5 @@ a.odt
 .~lock.a.odt#
 
 .env.local
+
+.vscode/
