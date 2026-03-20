@@ -2,31 +2,14 @@ package com.quazzom.mastermind.businessrules;
 
 import java.time.LocalDateTime;
 
+import com.quazzom.mastermind.entity.User;
 import com.quazzom.mastermind.exception.RequestInvalidPropertyValueException;
 import com.quazzom.mastermind.exception.RequestPropertyNotFoundException;
 import com.quazzom.mastermind.utils.MessageDefaultForPropertiesJSON;
 
-public class UserBusinessRule {
-
-	private Long id;
-	private String name;
-	private String email;
-	private String nickname;
-	private Integer age;
-	private String password;
-	private Integer loginAttempts;
-	private Integer bestScoreEasy;
-	private Integer bestScoreNormal;
-	private Integer bestScoreHard;
-	private Integer bestScoreMastermind;
-	private LocalDateTime createdAt;
+public class UserBusinessRule extends User{
 
 	private MessageDefaultForPropertiesJSON messageDefaultForPropertiesJSON;
-
-	// Construtores
-	//public UserBusinessRule() {
-		//this(0L, "", "", "", 0, "", 0, 0, 0, 0, 0, LocalDateTime.now());
-	//}
 
 	public UserBusinessRule(String name, String email, String nickname, Integer age, String password) {
 		this(0L, name, email, nickname, age, password, 0, 0, 0, 0, 0, LocalDateTime.now());
@@ -62,18 +45,6 @@ public class UserBusinessRule {
 
 	// Getters e Setters
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
 	public void setName(String name) {
 
 		if (name == null) {
@@ -86,11 +57,7 @@ public class UserBusinessRule {
 					"O nome deve conter apenas letras e espaços, com no máximo 60 caracteres");
 		}
 
-		this.name = name;
-	}
-
-	public String getEmail() {
-		return email;
+		super.setName(name);
 	}
 
 	public void setEmail(String email) {
@@ -114,11 +81,7 @@ public class UserBusinessRule {
 					"O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)");
 		}
 
-		this.email = email;
-	}
-
-	public String getNickname() {
-		return nickname;
+		super.setEmail(email);
 	}
 
 	public void setNickname(String nickname) {
@@ -133,11 +96,7 @@ public class UserBusinessRule {
 					"O nickname deve iniciar com letra minúscula, conter apenas letras minúsculas e números, e ter entre 4 e 20 caracteres");
 		}
 
-		this.nickname = nickname;
-	}
-
-	public Integer getAge() {
-		return age;
+		super.setNickname(nickname);
 	}
 
 	public void setAge(Integer age) {
@@ -149,12 +108,9 @@ public class UserBusinessRule {
 		if (age < 1 || age > 120) {
 			throw new RequestInvalidPropertyValueException("A idade deve ser um número entre 1 e 120");
 		}
-		this.age = age;
+		super.setAge(age);
 	}
 
-	public String getPassword() {
-		return password;
-	}
 
 	public void setPassword(String password) {
 		if (password == null) {
@@ -170,55 +126,7 @@ public class UserBusinessRule {
 			throw new RequestInvalidPropertyValueException(
 					"A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -");
 		}
-		this.password = password;
-	}
-
-	public Integer getLoginAttempts() {
-		return loginAttempts;
-	}
-
-	public void setLoginAttempts(Integer loginAttempts) {
-		this.loginAttempts = loginAttempts;
-	}
-
-	public Integer getBestScoreEasy() {
-		return bestScoreEasy;
-	}
-
-	public void setBestScoreEasy(Integer bestScoreEasy) {
-		this.bestScoreEasy = bestScoreEasy;
-	}
-
-	public Integer getBestScoreNormal() {
-		return bestScoreNormal;
-	}
-
-	public void setBestScoreNormal(Integer bestScoreNormal) {
-		this.bestScoreNormal = bestScoreNormal;
-	}
-
-	public Integer getBestScoreHard() {
-		return bestScoreHard;
-	}
-
-	public void setBestScoreHard(Integer bestScoreHard) {
-		this.bestScoreHard = bestScoreHard;
-	}
-
-	public Integer getBestScoreMastermind() {
-		return bestScoreMastermind;
-	}
-
-	public void setBestScoreMastermind(Integer bestScoreMastermind) {
-		this.bestScoreMastermind = bestScoreMastermind;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
+		super.setPassword(password);
 	}
 
 	public void setMessageDefaultForPropertiesJSON(MessageDefaultForPropertiesJSON messageDefaultForPropertiesJSON) {

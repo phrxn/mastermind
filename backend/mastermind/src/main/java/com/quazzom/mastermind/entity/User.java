@@ -1,5 +1,7 @@
 package com.quazzom.mastermind.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -10,13 +12,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-    private String email;
-    private String nickname;
-    private Integer age;
-    private String password;
+	private String name;
+	private String email;
+	private String nickname;
+	private Integer age = 0;
+	private String password;
 
-    private Integer loginAttempts = 0;
+	private Integer loginAttempts = 0;
+
+	private Integer bestScoreEasy = 0;
+	private Integer bestScoreNormal = 0;
+	private Integer bestScoreHard = 0;
+	private Integer bestScoreMastermind = 0;
+	private LocalDateTime createdAt = LocalDateTime.now();
 
 	public Long getId() {
 		return id;
@@ -72,6 +80,46 @@ public class User {
 
 	public void setLoginAttempts(Integer loginAttempts) {
 		this.loginAttempts = loginAttempts;
+	}
+
+	public Integer getBestScoreEasy() {
+		return bestScoreEasy;
+	}
+
+	public void setBestScoreEasy(Integer bestScoreEasy) {
+		this.bestScoreEasy = bestScoreEasy;
+	}
+
+	public Integer getBestScoreNormal() {
+		return bestScoreNormal;
+	}
+
+	public void setBestScoreNormal(Integer bestScoreNormal) {
+		this.bestScoreNormal = bestScoreNormal;
+	}
+
+	public Integer getBestScoreHard() {
+		return bestScoreHard;
+	}
+
+	public void setBestScoreHard(Integer bestScoreHard) {
+		this.bestScoreHard = bestScoreHard;
+	}
+
+	public Integer getBestScoreMastermind() {
+		return bestScoreMastermind;
+	}
+
+	public void setBestScoreMastermind(Integer bestScoreMastermind) {
+		this.bestScoreMastermind = bestScoreMastermind;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 
 }
