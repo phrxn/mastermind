@@ -80,11 +80,22 @@ class UserBusinessRuleTest {
 		assertEquals("Maria de Silva Santos", userBusinessRule.getName());
 	}
 
+
+
+
+
 	// ===== Email =====
 	@Test
 	void setEmailShouldPassWithValidEmail() {
 		assertDoesNotThrow(() -> userBusinessRule.setEmail("maria@teste.com"));
 		assertEquals("maria@teste.com", userBusinessRule.getEmail());
+	}
+
+
+	@Test
+	void setEmailShouldPassWithAComplexButValidEmail(){
+		assertDoesNotThrow(() -> userBusinessRule.setEmail("user.name+tag-123@example-domain.co"));
+		assertEquals("user.name+tag-123@example-domain.co", userBusinessRule.getEmail());
 	}
 
 	@Test
@@ -141,8 +152,16 @@ class UserBusinessRuleTest {
 
 	@Test
 	void setEmailShouldPassWhenEmailHasMinimumFormat() {
-		assertDoesNotThrow(() -> userBusinessRule.setEmail("a@b.c"));
-		assertEquals("a@b.c", userBusinessRule.getEmail());
+		assertDoesNotThrow(() -> userBusinessRule.setEmail("a@b.cc"));
+		assertEquals("a@b.cc", userBusinessRule.getEmail());
+	}
+
+	@Test
+	void setEmailShouldFailWhenTldHasOneCharacter() {
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userBusinessRule.setEmail("a@b.c"));
+		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)",
+				exception.getMessage());
 	}
 
 	@Test
@@ -163,6 +182,10 @@ class UserBusinessRuleTest {
 		assertDoesNotThrow(() -> userBusinessRule.setEmail("  maria@teste.com  "));
 		assertEquals("maria@teste.com", userBusinessRule.getEmail());
 	}
+
+
+
+
 
 	// ===== Nickname =====
 	@Test

@@ -7,7 +7,7 @@ import com.quazzom.mastermind.exception.RequestInvalidPropertyValueException;
 import com.quazzom.mastermind.exception.RequestPropertyNotFoundException;
 import com.quazzom.mastermind.utils.MessageDefaultForPropertiesJSON;
 
-public class UserBusinessRule extends User{
+public class UserBusinessRule extends User {
 
 	private MessageDefaultForPropertiesJSON messageDefaultForPropertiesJSON;
 
@@ -37,6 +37,7 @@ public class UserBusinessRule extends User{
 
 	// Getters e Setters
 
+	@Override
 	public void setName(String name) {
 
 		if (name == null) {
@@ -52,6 +53,7 @@ public class UserBusinessRule extends User{
 		super.setName(name);
 	}
 
+	@Override
 	public void setEmail(String email) {
 		if (email == null) {
 			throw new RequestPropertyNotFoundException(
@@ -68,7 +70,7 @@ public class UserBusinessRule extends User{
 			throw new RequestInvalidPropertyValueException("O email deve ter no máximo 50 caracteres");
 		}
 
-		if (!email.matches("^[A-Za-z]+@[A-Za-z0-9.-]*[A-Za-z]\\.[A-Za-z][A-Za-z0-9.-]*$")) {
+		if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
 			throw new RequestInvalidPropertyValueException(
 					"O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)");
 		}
@@ -76,6 +78,7 @@ public class UserBusinessRule extends User{
 		super.setEmail(email);
 	}
 
+	@Override
 	public void setNickname(String nickname) {
 
 		if (nickname == null) {
@@ -91,6 +94,7 @@ public class UserBusinessRule extends User{
 		super.setNickname(nickname);
 	}
 
+	@Override
 	public void setAge(Integer age) {
 		if (age == null) {
 			throw new RequestPropertyNotFoundException(
@@ -103,6 +107,7 @@ public class UserBusinessRule extends User{
 		super.setAge(age);
 	}
 
+	@Override
 	public void setPassword(String password) {
 		if (password == null) {
 			throw new RequestPropertyNotFoundException(
