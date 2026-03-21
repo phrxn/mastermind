@@ -3,9 +3,13 @@ package com.quazzom.mastermind.controller;
 import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.quazzom.mastermind.dto.LoginRequest;
 import com.quazzom.mastermind.dto.LoginResponse;
@@ -48,13 +52,14 @@ public class AuthController {
 	}
 
 	private Long extractUserId(Authentication authentication) {
+
 		Object principal = authentication.getPrincipal();
 		if (principal instanceof CustomUserDetails details) {
 			return details.getId();
 		}
 
 		try {
-			return Long.parseLong(authentication.getName());
+			return Long.valueOf(authentication.getName());
 		} catch (Exception ex) {
 			throw new UnauthorizedException("Usuário não autenticado");
 		}

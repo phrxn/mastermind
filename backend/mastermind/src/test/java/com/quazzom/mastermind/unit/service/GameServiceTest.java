@@ -1,34 +1,40 @@
 package com.quazzom.mastermind.unit.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import static org.mockito.ArgumentMatchers.any;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.quazzom.mastermind.businessrules.GameBusinessRole;
 import com.quazzom.mastermind.businessrules.GameEngine;
 import com.quazzom.mastermind.businessrules.GameEngineResult;
-import com.quazzom.mastermind.dto.GameCreateResponse;
-import com.quazzom.mastermind.dto.GameGiveUpResponse;
-import com.quazzom.mastermind.dto.GameGuessResponse;
+import com.quazzom.mastermind.dto.GameEndResponse;
+import com.quazzom.mastermind.dto.GameInProgressResponse;
+import com.quazzom.mastermind.dto.GameResponse;
 import com.quazzom.mastermind.dto.GameStatusResponse;
 import com.quazzom.mastermind.entity.Game;
 import com.quazzom.mastermind.entity.GameLevel;
 import com.quazzom.mastermind.entity.GameStatus;
+import com.quazzom.mastermind.entity.Guess;
 import com.quazzom.mastermind.entity.User;
 import com.quazzom.mastermind.exception.GameFlowException;
+import com.quazzom.mastermind.exception.GameNotFoundException;
+import com.quazzom.mastermind.exception.UnauthorizedException;
 import com.quazzom.mastermind.repository.GameRepository;
 import com.quazzom.mastermind.repository.GuessRepository;
 import com.quazzom.mastermind.repository.UserRepository;
@@ -49,109 +55,284 @@ class GameServiceTest {
 	@Mock
 	private GameEngine gameEngine;
 
+	@Mock
+	private GameBusinessRole gameBusinessRole;
+
 	@InjectMocks
 	private GameService gameService;
 
+	@Captor
+	private ArgumentCaptor<Game> gameCaptor;
+
+	@Captor
+	private ArgumentCaptor<Guess> guessCaptor;
+
 	private User user;
+	private Game inProgressGame;
 
 	@BeforeEach
 	void setUp() {
 		user = new User();
 		user.setId(10L);
-		user.setEmail("player@email.com");
+		user.setEmail("test@email.com");
+		user.setNickname("test");
+
+		inProgressGame = new Game();
+		inProgressGame.setId(100L);
+		inProgressGame.setUser(user);
+		inProgressGame.setLevel(GameLevel.EASY);
+		inProgressGame.setCodeLength(4);
+		inProgressGame.setAllowDuplicates(false);
+		inProgressGame.setSecretCode("1,2,3,4");
+		inProgressGame.setStatus(GameStatus.IN_PROGRESS);
+		inProgressGame.setAttemptsUsed(0);
 	}
 
+	// ===== createGame =====
 	@Test
-	void createGameShouldThrowWhenAlreadyInProgress() {
-		Game inProgress = new Game();
-		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
-		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
-				.thenReturn(Optional.of(inProgress));
-
-		assertThrows(GameFlowException.class, () -> gameService.createGame(10L, 1));
-		verify(gameRepository, never()).save(any(Game.class));
-	}
-
-	@Test
-	void createGameShouldPersistAndReturnInProgress() {
-		Game saved = new Game();
-		saved.setId(90L);
-		saved.setLevel(GameLevel.EASY);
+	void createGameShouldCreateAndReturnGameInProgress() {
 		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
 				.thenReturn(Optional.empty());
 		when(gameEngine.createSecret(4, false)).thenReturn(List.of(1, 2, 3, 4));
-		when(gameRepository.save(any(Game.class))).thenReturn(saved);
+		when(gameRepository.save(any(Game.class))).thenAnswer(invocation -> {
+			Game gameToSave = invocation.getArgument(0);
+			gameToSave.setId(999L);
+			return gameToSave;
+		});
 
-		GameCreateResponse response = gameService.createGame(10L, 1);
+		GameStatusResponse response = gameService.createGame(10L, 1);
+
+		verify(gameBusinessRole).setLevel(1);
+		verify(gameEngine).createSecret(4, false);
+		verify(gameRepository).save(gameCaptor.capture());
+
+		Game savedGame = gameCaptor.getValue();
+		assertEquals(user, savedGame.getUser());
+		assertEquals(GameLevel.EASY, savedGame.getLevel());
+		assertEquals(4, savedGame.getCodeLength());
+		assertEquals(false, savedGame.getAllowDuplicates());
+		assertEquals("1,2,3,4", savedGame.getSecretCode());
+		assertEquals(GameStatus.IN_PROGRESS, savedGame.getStatus());
+		assertEquals(0, savedGame.getAttemptsUsed());
 
 		assertEquals("GAME_IN_PROGRESS", response.getStatus());
 		assertEquals(1, response.getGameLevel());
+		assertEquals(4, response.getNumberOfColumnColors());
+		assertEquals(GameEngine.MAX_ATTEMPTS, response.getMaximumOfattempts());
+		assertEquals(false, response.isRepeatedColorAllowed());
+		assertTrue(response.getRows().isEmpty());
 	}
 
 	@Test
-	void makeGuessShouldReturnGameWinWhenAllPositionsMatch() {
-		Game game = new Game();
-		game.setId(7L);
-		game.setLevel(GameLevel.EASY);
-		game.setCodeLength(4);
-		game.setSecretCode("1,2,3,4");
-		game.setStatus(GameStatus.IN_PROGRESS);
-		game.setAttemptsUsed(0);
+	void createGameShouldThrowWhenUserIsNotAuthenticated() {
+		when(userRepository.findById(10L)).thenReturn(Optional.empty());
 
-		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
-		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
-				.thenReturn(Optional.of(game));
-		when(gameEngine.isWinning(any(GameEngineResult.class), org.mockito.ArgumentMatchers.eq(4))).thenReturn(true);
-		when(gameEngine.evaluate(List.of(1, 2, 3, 4), List.of(1, 2, 3, 4)))
-				.thenReturn(new GameEngineResult(4, 0, List.of(1, 1, 1, 1)));
+		UnauthorizedException exception = assertThrows(UnauthorizedException.class,
+				() -> gameService.createGame(10L, 1));
 
-		GameGuessResponse response = gameService.makeGuess(10L, List.of(1, 2, 3, 4));
-
-		assertEquals("GAME_WIN", response.getStatus());
-		assertEquals(List.of(1, 2, 3, 4), response.getSecret());
-		verify(guessRepository).save(any());
-		verify(gameRepository).save(any(Game.class));
+		assertEquals("Usuário não autenticado", exception.getMessage());
 	}
 
 	@Test
-	void giveUpShouldCloseGameAndReturnSecret() {
-		Game game = new Game();
-		game.setId(7L);
-		game.setLevel(GameLevel.NORMAL);
-		game.setCodeLength(4);
-		game.setSecretCode("6,5,4,3");
-		game.setStatus(GameStatus.IN_PROGRESS);
+	void createGameShouldThrowWhenAlreadyExistsGameInProgress() {
+		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
+		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
+				.thenReturn(Optional.of(inProgressGame));
+
+		GameFlowException exception = assertThrows(GameFlowException.class,
+				() -> gameService.createGame(10L, 1));
+
+		assertEquals("Já existe um jogo em andamento, não é possível iniciar um novo enquanto houver outro em andamento",
+				exception.getMessage());
+	}
+
+	// ===== makeGuess =====
+	@Test
+	void makeGuessShouldReturnGameInProgressWhenNotWinningAndAttemptsRemain() {
+		List<Integer> guessValues = List.of(1, 2, 4, 6);
+		GameEngineResult result = new GameEngineResult(2, 1);
 
 		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
-				.thenReturn(Optional.of(game));
+				.thenReturn(Optional.of(inProgressGame));
+		when(gameEngine.evaluate(List.of(1, 2, 3, 4), guessValues)).thenReturn(result);
+		when(gameEngine.isWinning(result, 4)).thenReturn(false);
 
-		GameGiveUpResponse response = gameService.giveUp(10L);
+		GameResponse response = gameService.makeGuess(10L, guessValues);
+
+		assertInstanceOf(GameInProgressResponse.class, response);
+		GameInProgressResponse inProgressResponse = (GameInProgressResponse) response;
+		assertEquals("GAME_IN_PROGRESS", inProgressResponse.getStatus());
+		assertEquals(1, inProgressResponse.getGameLevel());
+		assertEquals(2, inProgressResponse.getTips().getCorrectPositions());
+		assertEquals(1, inProgressResponse.getTips().getCorrectColors());
+
+		verify(gameBusinessRole).setGuess(guessValues);
+		verify(gameEngine).validateGuess(inProgressGame, guessValues);
+		verify(guessRepository).save(guessCaptor.capture());
+		verify(gameRepository).save(inProgressGame);
+
+		Guess savedGuess = guessCaptor.getValue();
+		assertEquals(1, savedGuess.getAttemptNumber());
+		assertEquals("1,2,4,6", savedGuess.getGuess());
+		assertEquals(2, savedGuess.getCorrectPositions());
+		assertEquals(1, savedGuess.getCorrectColors());
+		assertEquals(1, inProgressGame.getAttemptsUsed());
+	}
+
+	@Test
+	void makeGuessShouldReturnGameWinWhenGuessMatchesSecret() {
+		List<Integer> guessValues = List.of(1, 2, 3, 4);
+		GameEngineResult result = new GameEngineResult(4, 0);
+
+		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
+		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
+				.thenReturn(Optional.of(inProgressGame));
+		when(gameEngine.evaluate(List.of(1, 2, 3, 4), guessValues)).thenReturn(result);
+		when(gameEngine.isWinning(result, 4)).thenReturn(true);
+
+		GameResponse response = gameService.makeGuess(10L, guessValues);
+
+		assertInstanceOf(GameEndResponse.class, response);
+		GameEndResponse endResponse = (GameEndResponse) response;
+		assertEquals("GAME_WIN", endResponse.getStatus());
+		assertEquals(1, endResponse.getGameLevel());
+		assertEquals(List.of(1, 2, 3, 4), endResponse.getSecret());
+		assertEquals(GameStatus.WON, inProgressGame.getStatus());
+		assertNotNull(inProgressGame.getFinishedAt());
+	}
+
+	@Test
+	void makeGuessShouldReturnGameOverWhenMaxAttemptsIsReached() {
+		inProgressGame.setAttemptsUsed(9);
+		List<Integer> guessValues = List.of(6, 5, 4, 3);
+		GameEngineResult result = new GameEngineResult(0, 2);
+
+		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
+		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
+				.thenReturn(Optional.of(inProgressGame));
+		when(gameEngine.evaluate(List.of(1, 2, 3, 4), guessValues)).thenReturn(result);
+		when(gameEngine.isWinning(result, 4)).thenReturn(false);
+
+		GameResponse response = gameService.makeGuess(10L, guessValues);
+
+		assertInstanceOf(GameEndResponse.class, response);
+		GameEndResponse endResponse = (GameEndResponse) response;
+		assertEquals("GAME_OVER", endResponse.getStatus());
+		assertEquals(1, endResponse.getGameLevel());
+		assertEquals(List.of(1, 2, 3, 4), endResponse.getSecret());
+		assertEquals(GameStatus.LOST, inProgressGame.getStatus());
+		assertNotNull(inProgressGame.getFinishedAt());
+		assertEquals(10, inProgressGame.getAttemptsUsed());
+	}
+
+	@Test
+	void makeGuessShouldThrowWhenUserIsNotAuthenticated() {
+		when(userRepository.findById(10L)).thenReturn(Optional.empty());
+
+		UnauthorizedException exception = assertThrows(UnauthorizedException.class,
+				() -> gameService.makeGuess(10L, List.of(1, 2, 3, 4)));
+
+		assertEquals("Usuário não autenticado", exception.getMessage());
+	}
+
+	@Test
+	void makeGuessShouldThrowWhenNoGameInProgress() {
+		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
+		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
+				.thenReturn(Optional.empty());
+
+		GameFlowException exception = assertThrows(GameFlowException.class,
+				() -> gameService.makeGuess(10L, List.of(1, 2, 3, 4)));
+
+		assertEquals("Não existe nenhum jogo em andamento, não é possível fazer essa operação", exception.getMessage());
+	}
+
+	// ===== giveUp =====
+	@Test
+	void giveUpShouldEndGameWithGaveUpStatus() {
+		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
+		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
+				.thenReturn(Optional.of(inProgressGame));
+		when(gameRepository.save(any(Game.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+		GameEndResponse response = gameService.giveUp(10L);
 
 		assertEquals("GAME_GIVE_UP", response.getStatus());
-		assertEquals(List.of(6, 5, 4, 3), response.getSecret());
-		verify(gameRepository).save(any(Game.class));
+		assertEquals(1, response.getGameLevel());
+		assertEquals(List.of(1, 2, 3, 4), response.getSecret());
+		assertEquals(GameStatus.GAVE_UP, inProgressGame.getStatus());
+		assertNotNull(inProgressGame.getFinishedAt());
+		verify(gameRepository).save(inProgressGame);
 	}
 
 	@Test
-	void statusShouldReturnEmptyWhenNoInProgressGameExists() {
+	void giveUpShouldThrowWhenNoGameInProgress() {
 		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
 				.thenReturn(Optional.empty());
 
-		Optional<GameStatusResponse> result = gameService.status(10L);
+		GameNotFoundException exception = assertThrows(GameNotFoundException.class,
+				() -> gameService.giveUp(10L));
 
-		assertTrue(result.isEmpty());
+		assertEquals("Não existe nenhum jogo em andamento para desistir", exception.getMessage());
 	}
 
+	// ===== status =====
 	@Test
-	void makeGuessShouldThrowWhenNoInProgressGameExists() {
+	void statusShouldReturnEmptyWhenNoGameInProgress() {
 		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
 				.thenReturn(Optional.empty());
 
-		assertThrows(GameFlowException.class, () -> gameService.makeGuess(10L, List.of(1, 2, 3, 4)));
-		verify(guessRepository, never()).save(any());
+		Optional<GameStatusResponse> response = gameService.status(10L);
+
+		assertTrue(response.isEmpty());
 	}
+
+	@Test
+	void statusShouldReturnRowsWhenGameIsInProgress() {
+		Guess guess1 = new Guess();
+		guess1.setAttemptNumber(1);
+		guess1.setGuess("1,2,4,6");
+		guess1.setCorrectPositions(2);
+		guess1.setCorrectColors(1);
+
+		Guess guess2 = new Guess();
+		guess2.setAttemptNumber(2);
+		guess2.setGuess("1,2,3,4");
+		guess2.setCorrectPositions(4);
+		guess2.setCorrectColors(0);
+
+		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
+		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
+				.thenReturn(Optional.of(inProgressGame));
+		when(guessRepository.findByGameIdOrderByAttemptNumberAsc(100L)).thenReturn(List.of(guess1, guess2));
+
+		Optional<GameStatusResponse> responseOpt = gameService.status(10L);
+
+		assertTrue(responseOpt.isPresent());
+		GameStatusResponse response = responseOpt.get();
+		assertEquals("GAME_IN_PROGRESS", response.getStatus());
+		assertEquals(1, response.getGameLevel());
+		assertEquals(4, response.getNumberOfColumnColors());
+		assertEquals(GameEngine.MAX_ATTEMPTS, response.getMaximumOfattempts());
+		assertEquals(false, response.isRepeatedColorAllowed());
+		assertEquals(2, response.getRows().size());
+		assertEquals(List.of(1, 2, 4, 6), response.getRows().get(0).getGuess());
+		assertEquals(2, response.getRows().get(0).getTips().getCorrectPositions());
+		assertEquals(1, response.getRows().get(0).getTips().getCorrectColors());
+	}
+
+	@Test
+	void statusShouldThrowWhenUserIsNotAuthenticated() {
+		when(userRepository.findById(10L)).thenReturn(Optional.empty());
+
+		UnauthorizedException exception = assertThrows(UnauthorizedException.class,
+				() -> gameService.status(10L));
+
+		assertEquals("Usuário não autenticado", exception.getMessage());
+	}
+
 }

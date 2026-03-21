@@ -24,6 +24,9 @@ public class UserBusinessRule extends User {
 	public UserBusinessRule(Long id, String name, String email, String nickname, Integer age,
 			String password, Integer loginAttempts,
 			LocalDateTime createdAt, MessageDefaultForPropertiesJSON messageDefaultForPropertiesJSON) {
+
+		this.messageDefaultForPropertiesJSON = messageDefaultForPropertiesJSON;
+
 		setId(id);
 		setName(name);
 		setEmail(email);
@@ -32,7 +35,7 @@ public class UserBusinessRule extends User {
 		setPassword(password);
 		setLoginAttempts(loginAttempts);
 		setCreatedAt(createdAt);
-		setMessageDefaultForPropertiesJSON(messageDefaultForPropertiesJSON);
+
 	}
 
 	// Getters e Setters

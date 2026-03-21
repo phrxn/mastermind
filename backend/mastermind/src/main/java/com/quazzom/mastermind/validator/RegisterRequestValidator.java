@@ -11,7 +11,7 @@ public class RegisterRequestValidator implements RequestValidator<RegisterReques
 	private UserBusinessRule userBusinessRule;
 
 	public RegisterRequestValidator() {
-		this(new UserBusinessRule("abc", "a@a.a", "abcdef", 1, "Abc@1224"));
+		this(new UserBusinessRule("abc", "a@a.com", "abcdef", 1, "Abc@1224"));
 	}
 
 	public RegisterRequestValidator(UserBusinessRule userBusinessRule) {

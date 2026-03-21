@@ -20,7 +20,7 @@ class RegisterRequestValidatorTest {
 
 	@BeforeEach
 	void setUp() {
-		UserBusinessRule userBusinessRule = new UserBusinessRule("abc", "a@a.a", "abcdef", 1, "Abc@1224");
+		UserBusinessRule userBusinessRule = new UserBusinessRule("abc", "a@a.com", "abcdef", 1, "Abc@1224");
 		userBusinessRule.setMessageDefaultForPropertiesJSON(new MessageDefaultForPropertiesJSON());
 		userValidator = new RegisterRequestValidator(userBusinessRule);
 	}
@@ -137,9 +137,20 @@ class RegisterRequestValidatorTest {
 	@Test
 	void validateRegisterShouldPassWhenEmailHasMinimumFormat() {
 		RegisterRequest request = validRequest();
-		request.setEmail("a@b.c");
+		request.setEmail("a@b.cc");
 
 		assertDoesNotThrow(() -> userValidator.validateRequestBody(request));
+	}
+
+	@Test
+	void validateRegisterShouldFailWhenEmailTldHasOneCharacter() {
+		RegisterRequest request = validRequest();
+		request.setEmail("a@b.c");
+
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userValidator.validateRequestBody(request));
+		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)",
+				exception.getMessage());
 	}
 
 	@Test
