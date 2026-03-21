@@ -1,6 +1,10 @@
 package com.quazzom.mastermind.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -12,4 +16,24 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByNickname(String nickname);
     Optional<User> findByEmail(String email);
     Optional<User> findByNickname(String nickname);
+
+    @Modifying
+    @Transactional
+    @Query("""
+        UPDATE User u
+        SET u.name = :name,
+            u.email = :email,
+            u.nickname = :nickname,
+            u.age = :age,
+            u.password = :password
+        WHERE u.id = :id
+    """)
+    int updateUserInfoById(
+        @Param("id") Long id,
+        @Param("name") String name,
+        @Param("email") String email,
+        @Param("nickname") String nickname,
+        @Param("age") Integer age,
+        @Param("password") String password
+    );
 }

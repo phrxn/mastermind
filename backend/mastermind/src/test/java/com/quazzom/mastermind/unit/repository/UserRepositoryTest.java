@@ -15,5 +15,17 @@ class UserRepositoryTest {
         assertTrue(JpaRepository.class.isAssignableFrom(UserRepository.class));
         assertNotNull(UserRepository.class.getMethod("existsByEmail", String.class));
         assertNotNull(UserRepository.class.getMethod("existsByNickname", String.class));
+
+        assertNotNull(
+            UserRepository.class.getMethod(
+                "updateUserInfoById",
+                Long.class,
+                String.class,
+                String.class,
+                String.class,
+                Integer.class,
+                String.class
+            )
+        );
     }
 }

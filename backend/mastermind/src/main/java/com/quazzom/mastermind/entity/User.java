@@ -1,6 +1,8 @@
 package com.quazzom.mastermind.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 
@@ -25,6 +27,9 @@ public class User {
 	private Integer bestScoreHard = 0;
 	private Integer bestScoreMastermind = 0;
 	private LocalDateTime createdAt = LocalDateTime.now();
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Game> games = new ArrayList<>();
 
 	public Long getId() {
 		return id;
@@ -120,6 +125,14 @@ public class User {
 
 	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
+	}
+
+	public List<Game> getGames() {
+		return games;
+	}
+
+	public void setGames(List<Game> games) {
+		this.games = games;
 	}
 
 }

@@ -14,7 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.quazzom.mastermind.entity.Game;
+import com.quazzom.mastermind.entity.GameLevel;
+import com.quazzom.mastermind.entity.GameStatus;
+import com.quazzom.mastermind.entity.Guess;
 import com.quazzom.mastermind.entity.User;
+import com.quazzom.mastermind.repository.GameRepository;
+import com.quazzom.mastermind.repository.GuessRepository;
 import com.quazzom.mastermind.repository.UserRepository;
 
 @SpringBootTest
@@ -24,8 +30,16 @@ public class UserRepositoryIntegrationTest {
 	@Autowired
 	private UserRepository userRepository;
 
+	@Autowired
+	private GameRepository gameRepository;
+
+	@Autowired
+	private GuessRepository guessRepository;
+
 	@BeforeEach
 	void setUp() {
+		guessRepository.deleteAll();
+		gameRepository.deleteAll();
 		userRepository.deleteAll();
 	}
 
@@ -113,6 +127,69 @@ public class UserRepositoryIntegrationTest {
 		assertNotNull(saved.getCreatedAt());
 	}
 
+	@Test
+	void shouldDeleteUserById() {
+		User user = buildValidUser("delete@email.com", "deleteUser");
+		User saved = userRepository.save(user);
+
+		userRepository.deleteById(saved.getId());
+
+		assertFalse(userRepository.existsByEmail("delete@email.com"));
+	}
+
+	@Test
+	void shouldUpdateUserInfoById() {
+		User user = buildValidUser("old@email.com", "oldNick");
+		User saved = userRepository.save(user);
+
+		int rows = userRepository.updateUserInfoById(
+			saved.getId(),
+			"Novo Nome",
+			"new@email.com",
+			"newNick",
+			33,
+			"new-password"
+		);
+
+		Optional<User> updated = userRepository.findById(saved.getId());
+
+		assertEquals(1, rows);
+		assertTrue(updated.isPresent());
+		assertEquals("Novo Nome", updated.get().getName());
+		assertEquals("new@email.com", updated.get().getEmail());
+		assertEquals("newNick", updated.get().getNickname());
+		assertEquals(33, updated.get().getAge());
+		assertEquals("new-password", updated.get().getPassword());
+	}
+
+	@Test
+	void shouldDeleteUserCascadeGamesAndGuesses() {
+		User user = buildValidUser("cascadeDelete@email.com", "cascadeJogador");
+		User savedUser = userRepository.save(user);
+
+		Game game = new Game();
+		game.setUser(savedUser);
+		game.setLevel(GameLevel.EASY);
+		game.setCodeLength(4);
+		game.setAllowDuplicates(false);
+		game.setSecretCode("RGBY");
+		game.setStatus(GameStatus.IN_PROGRESS);
+		Game savedGame = gameRepository.save(game);
+
+		Guess guess = new Guess();
+		guess.setGame(savedGame);
+		guess.setAttemptNumber(1);
+		guess.setGuess("RRGG");
+		guess.setCorrectPositions(1);
+		guess.setCorrectColors(1);
+		guessRepository.save(guess);
+
+		userRepository.deleteById(savedUser.getId());
+
+		assertFalse(userRepository.existsByEmail("cascadeDelete@email.com"));
+		assertTrue(gameRepository.findByUserId(savedUser.getId()).isEmpty());
+	}
+
 	private User buildValidUser(String email, String nickname) {
 		User user = new User();
 		user.setName("Usuário Teste");
@@ -122,4 +199,6 @@ public class UserRepositoryIntegrationTest {
 		user.setPassword("senha");
 		return user;
 	}
+
+
 }
