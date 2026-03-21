@@ -85,10 +85,6 @@ public class UserRepositoryIntegrationTest {
 		user.setAge(25);
 		user.setPassword("senha-segura");
 		user.setLoginAttempts(2);
-		user.setBestScoreEasy(10);
-		user.setBestScoreNormal(20);
-		user.setBestScoreHard(30);
-		user.setBestScoreMastermind(40);
 		LocalDateTime createdAt = LocalDateTime.now().minusDays(1);
 		user.setCreatedAt(createdAt);
 
@@ -101,10 +97,6 @@ public class UserRepositoryIntegrationTest {
 		assertEquals(25, saved.getAge());
 		assertEquals("senha-segura", saved.getPassword());
 		assertEquals(2, saved.getLoginAttempts());
-		assertEquals(10, saved.getBestScoreEasy());
-		assertEquals(20, saved.getBestScoreNormal());
-		assertEquals(30, saved.getBestScoreHard());
-		assertEquals(40, saved.getBestScoreMastermind());
 		assertEquals(createdAt, saved.getCreatedAt());
 	}
 
@@ -120,10 +112,6 @@ public class UserRepositoryIntegrationTest {
 
 		assertEquals(0, saved.getAge());
 		assertEquals(0, saved.getLoginAttempts());
-		assertEquals(0, saved.getBestScoreEasy());
-		assertEquals(0, saved.getBestScoreNormal());
-		assertEquals(0, saved.getBestScoreHard());
-		assertEquals(0, saved.getBestScoreMastermind());
 		assertNotNull(saved.getCreatedAt());
 	}
 

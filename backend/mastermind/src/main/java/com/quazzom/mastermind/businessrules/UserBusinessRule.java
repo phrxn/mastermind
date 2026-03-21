@@ -12,21 +12,17 @@ public class UserBusinessRule extends User{
 	private MessageDefaultForPropertiesJSON messageDefaultForPropertiesJSON;
 
 	public UserBusinessRule(String name, String email, String nickname, Integer age, String password) {
-		this(0L, name, email, nickname, age, password, 0, 0, 0, 0, 0, LocalDateTime.now());
+		this(0L, name, email, nickname, age, password, 0, LocalDateTime.now());
 	}
 
 	public UserBusinessRule(Long id, String name, String email, String nickname, Integer age,
-			String password, Integer loginAttempts, Integer bestScoreEasy,
-			Integer bestScoreNormal, Integer bestScoreHard, Integer bestScoreMastermind,
-			LocalDateTime createdAt) {
-		this(id, name, email, nickname, age, password, loginAttempts, bestScoreEasy,
-				bestScoreNormal, bestScoreHard, bestScoreMastermind, createdAt,
+			String password, Integer loginAttempts, LocalDateTime createdAt) {
+		this(id, name, email, nickname, age, password, loginAttempts, createdAt,
 				new MessageDefaultForPropertiesJSON());
 	}
 
 	public UserBusinessRule(Long id, String name, String email, String nickname, Integer age,
-			String password, Integer loginAttempts, Integer bestScoreEasy,
-			Integer bestScoreNormal, Integer bestScoreHard, Integer bestScoreMastermind,
+			String password, Integer loginAttempts,
 			LocalDateTime createdAt, MessageDefaultForPropertiesJSON messageDefaultForPropertiesJSON) {
 		setId(id);
 		setName(name);
@@ -35,10 +31,6 @@ public class UserBusinessRule extends User{
 		setAge(age);
 		setPassword(password);
 		setLoginAttempts(loginAttempts);
-		setBestScoreEasy(bestScoreEasy);
-		setBestScoreNormal(bestScoreNormal);
-		setBestScoreHard(bestScoreHard);
-		setBestScoreMastermind(bestScoreMastermind);
 		setCreatedAt(createdAt);
 		setMessageDefaultForPropertiesJSON(messageDefaultForPropertiesJSON);
 	}
@@ -110,7 +102,6 @@ public class UserBusinessRule extends User{
 		}
 		super.setAge(age);
 	}
-
 
 	public void setPassword(String password) {
 		if (password == null) {

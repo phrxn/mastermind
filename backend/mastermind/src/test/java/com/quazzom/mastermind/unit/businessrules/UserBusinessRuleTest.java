@@ -23,7 +23,7 @@ class UserBusinessRuleTest {
 	void setUp() {
 		messageDefaultForPropertiesJSON = new MessageDefaultForPropertiesJSON();
 		userBusinessRule = new UserBusinessRule(null, "Maria Silva", "maria@teste.com", "maria",
-				25, "Abc123!", 0, 0, 0, 0, 0, LocalDateTime.now(),
+				25, "Abc123!", 0, LocalDateTime.now(),
 				messageDefaultForPropertiesJSON);
 	}
 
@@ -454,30 +454,6 @@ class UserBusinessRuleTest {
 	void setLoginAttemptsShouldWork() {
 		assertDoesNotThrow(() -> userBusinessRule.setLoginAttempts(3));
 		assertEquals(3, userBusinessRule.getLoginAttempts());
-	}
-
-	@Test
-	void setBestScoreEasyShouldWork() {
-		assertDoesNotThrow(() -> userBusinessRule.setBestScoreEasy(100));
-		assertEquals(100, userBusinessRule.getBestScoreEasy());
-	}
-
-	@Test
-	void setBestScoreNormalShouldWork() {
-		assertDoesNotThrow(() -> userBusinessRule.setBestScoreNormal(200));
-		assertEquals(200, userBusinessRule.getBestScoreNormal());
-	}
-
-	@Test
-	void setBestScoreHardShouldWork() {
-		assertDoesNotThrow(() -> userBusinessRule.setBestScoreHard(300));
-		assertEquals(300, userBusinessRule.getBestScoreHard());
-	}
-
-	@Test
-	void setBestScoreMastermindShouldWork() {
-		assertDoesNotThrow(() -> userBusinessRule.setBestScoreMastermind(400));
-		assertEquals(400, userBusinessRule.getBestScoreMastermind());
 	}
 
 	@Test

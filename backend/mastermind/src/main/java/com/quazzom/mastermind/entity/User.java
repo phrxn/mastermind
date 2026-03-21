@@ -22,10 +22,6 @@ public class User {
 
 	private Integer loginAttempts = 0;
 
-	private Integer bestScoreEasy = 0;
-	private Integer bestScoreNormal = 0;
-	private Integer bestScoreHard = 0;
-	private Integer bestScoreMastermind = 0;
 	private LocalDateTime createdAt = LocalDateTime.now();
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -85,38 +81,6 @@ public class User {
 
 	public void setLoginAttempts(Integer loginAttempts) {
 		this.loginAttempts = loginAttempts;
-	}
-
-	public Integer getBestScoreEasy() {
-		return bestScoreEasy;
-	}
-
-	public void setBestScoreEasy(Integer bestScoreEasy) {
-		this.bestScoreEasy = bestScoreEasy;
-	}
-
-	public Integer getBestScoreNormal() {
-		return bestScoreNormal;
-	}
-
-	public void setBestScoreNormal(Integer bestScoreNormal) {
-		this.bestScoreNormal = bestScoreNormal;
-	}
-
-	public Integer getBestScoreHard() {
-		return bestScoreHard;
-	}
-
-	public void setBestScoreHard(Integer bestScoreHard) {
-		this.bestScoreHard = bestScoreHard;
-	}
-
-	public Integer getBestScoreMastermind() {
-		return bestScoreMastermind;
-	}
-
-	public void setBestScoreMastermind(Integer bestScoreMastermind) {
-		this.bestScoreMastermind = bestScoreMastermind;
 	}
 
 	public LocalDateTime getCreatedAt() {

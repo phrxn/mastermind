@@ -61,7 +61,6 @@ public class GameRepositoryIntegrationTest {
 		game.setSecretCode("RRGGBB");
 		game.setStatus(GameStatus.WON);
 		game.setAttemptsUsed(4);
-		game.setScore(1000);
 		LocalDateTime createdAt = LocalDateTime.now().minusHours(1);
 		LocalDateTime finishedAt = LocalDateTime.now();
 		game.setCreatedAt(createdAt);
@@ -77,7 +76,6 @@ public class GameRepositoryIntegrationTest {
 		assertEquals("RRGGBB", saved.getSecretCode());
 		assertEquals(GameStatus.WON, saved.getStatus());
 		assertEquals(4, saved.getAttemptsUsed());
-		assertEquals(1000, saved.getScore());
 		assertEquals(createdAt, saved.getCreatedAt());
 		assertEquals(finishedAt, saved.getFinishedAt());
 	}

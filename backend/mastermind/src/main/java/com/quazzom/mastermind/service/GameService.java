@@ -71,7 +71,6 @@ public class GameService {
 		game.setSecretCode(encode(secret));
 		game.setStatus(GameStatus.IN_PROGRESS);
 		game.setAttemptsUsed(0);
-		game.setScore(0);
 
 		Game saved = gameRepository.save(game);
 		inMemorySecretsByGameId.put(saved.getId(), new ArrayList<>(secret));
@@ -102,7 +101,6 @@ public class GameService {
 		if (gameEngine.isWinning(result, game.getCodeLength())) {
 			game.setStatus(GameStatus.WON);
 			game.setFinishedAt(LocalDateTime.now());
-			game.setScore(calculateScore(nextAttemptNumber));
 			gameRepository.save(game);
 			inMemorySecretsByGameId.remove(game.getId());
 
@@ -112,7 +110,6 @@ public class GameService {
 		if (nextAttemptNumber >= GameEngine.MAX_ATTEMPTS) {
 			game.setStatus(GameStatus.LOST);
 			game.setFinishedAt(LocalDateTime.now());
-			game.setScore(0);
 			gameRepository.save(game);
 			inMemorySecretsByGameId.remove(game.getId());
 
@@ -160,11 +157,6 @@ public class GameService {
 				columns);
 
 		return Optional.of(response);
-	}
-
-	private int calculateScore(int attemptsUsed) {
-		int remaining = Math.max(0, GameEngine.MAX_ATTEMPTS - attemptsUsed + 1);
-		return remaining * 100;
 	}
 
 	private User findAuthenticatedUser(Long userId) {

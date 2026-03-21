@@ -40,7 +40,6 @@ public class Game {
 	private GameStatus status;
 
 	private Integer attemptsUsed = 0;
-	private Integer score = 0;
 	private LocalDateTime createdAt = LocalDateTime.now();
 	private LocalDateTime finishedAt;
 
@@ -109,14 +108,6 @@ public class Game {
 
 	public void setAttemptsUsed(Integer attemptsUsed) {
 		this.attemptsUsed = attemptsUsed;
-	}
-
-	public Integer getScore() {
-		return score;
-	}
-
-	public void setScore(Integer score) {
-		this.score = score;
 	}
 
 	public LocalDateTime getCreatedAt() {
