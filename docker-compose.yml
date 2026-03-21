@@ -12,7 +12,7 @@ services:
       MARIADB_USER: ${MARIADB_USER}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
     ports:
-      - "${MARIADB_PORT}:3306"
+      - "${MARIADB_HOST_PORT}:3306"
     networks:
       - mastermind
 
@@ -30,7 +30,7 @@ services:
       MARIADB_USER: ${MARIADB_USER}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
     ports:
-      - "${MARIADB_PORT_DB_TEST}:3306"
+      - "${MARIADB_HOST_PORT_DB_TEST}:3306"
     networks:
       - mastermind
 
