@@ -103,14 +103,14 @@ class AuthControllerTest {
         user.setAge(25);
         MeResponse expected = new MeResponse(user);
 
-        when(authentication.getName()).thenReturn("maria@teste.com");
-        when(userService.me("maria@teste.com")).thenReturn(expected);
+        when(authentication.getName()).thenReturn("10");
+        when(userService.me(10L)).thenReturn(expected);
 
         ResponseEntity<MeResponse> actual = authController.me(authentication);
 
         assertEquals(HttpStatus.OK, actual.getStatusCode());
         assertTrue(actual.getBody().isAuthenticated());
         assertSame(expected, actual.getBody());
-        verify(userService).me("maria@teste.com");
+        verify(userService).me(10L);
     }
 }

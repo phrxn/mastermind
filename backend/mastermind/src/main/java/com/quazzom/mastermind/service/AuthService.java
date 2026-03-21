@@ -81,9 +81,9 @@ public class AuthService {
 		return new LoginResponse(token);
 	}
 
-	public MeResponse me(String email) {
+	public MeResponse me(Long userId) {
 
-		User user = userRepository.findByEmail(email)
+		User user = userRepository.findById(userId)
 				.orElseThrow(() -> new UnauthorizedException("Usuário não autenticado"));
 
 		return new MeResponse(user);

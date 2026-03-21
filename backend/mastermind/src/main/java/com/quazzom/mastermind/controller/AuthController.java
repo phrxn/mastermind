@@ -12,6 +12,8 @@ import com.quazzom.mastermind.dto.LoginResponse;
 import com.quazzom.mastermind.dto.MeResponse;
 import com.quazzom.mastermind.dto.RegisterRequest;
 import com.quazzom.mastermind.dto.RegisterResponse;
+import com.quazzom.mastermind.exception.UnauthorizedException;
+import com.quazzom.mastermind.security.CustomUserDetails;
 import com.quazzom.mastermind.service.AuthService;
 
 @RestController
@@ -41,8 +43,21 @@ public class AuthController {
 
 	@GetMapping("/me")
 	public ResponseEntity<MeResponse> me(Authentication authentication) {
-		String email = authentication.getName();
-		return ResponseEntity.ok(userService.me(email));
+		Long userId = extractUserId(authentication);
+		return ResponseEntity.ok(userService.me(userId));
+	}
+
+	private Long extractUserId(Authentication authentication) {
+		Object principal = authentication.getPrincipal();
+		if (principal instanceof CustomUserDetails details) {
+			return details.getId();
+		}
+
+		try {
+			return Long.parseLong(authentication.getName());
+		} catch (Exception ex) {
+			throw new UnauthorizedException("Usuário não autenticado");
+		}
 	}
 
 }

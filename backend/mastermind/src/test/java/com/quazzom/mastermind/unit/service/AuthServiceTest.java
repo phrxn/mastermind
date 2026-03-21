@@ -207,9 +207,9 @@ class AuthServiceTest {
 		user.setNickname("maria");
 		user.setAge(25);
 
-		when(userRepository.findByEmail("maria@teste.com")).thenReturn(Optional.of(user));
+		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 
-		MeResponse response = authService.me("maria@teste.com");
+		MeResponse response = authService.me(10L);
 
 		assertTrue(response.isAuthenticated());
 		assertEquals(10L, response.getId());
@@ -221,10 +221,10 @@ class AuthServiceTest {
 
 	@Test
 	void meShouldThrowWhenUserFromTokenIsNotFound() {
-		when(userRepository.findByEmail("ghost@teste.com")).thenReturn(Optional.empty());
+		when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
 		UnauthorizedException exception = assertThrows(UnauthorizedException.class,
-				() -> authService.me("ghost@teste.com"));
+				() -> authService.me(999L));
 
 		assertEquals("Usuário não autenticado", exception.getMessage());
 	}

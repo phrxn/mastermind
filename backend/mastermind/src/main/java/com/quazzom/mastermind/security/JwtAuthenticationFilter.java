@@ -47,8 +47,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String email = jwtService.extractSubject(token);
-        CustomUserDetails user = (CustomUserDetails) customUserDetailsService.loadUserByUsername(email);
+        String subject = jwtService.extractSubject(token);
+        Long userId;
+        try {
+            userId = Long.parseLong(subject);
+        } catch (NumberFormatException ex) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\":\"Token inválido\",\"status\":401}");
+            return;
+        }
+
+        CustomUserDetails user = (CustomUserDetails) customUserDetailsService.loadUserById(userId);
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
             user,
                 null,
