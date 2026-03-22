@@ -108,9 +108,9 @@ class GameServiceTest {
 			return gameToSave;
 		});
 
-		GameStatusResponse response = gameService.createGame(10L, 1);
+		GameStatusResponse response = gameService.createGame(10L, GameLevel.EASY);
 
-		verify(gameBusinessRole).setLevel(1);
+		verify(gameBusinessRole).setLevel(GameLevel.EASY);
 		verify(gameEngine).createSecret(4, false);
 		verify(gameRepository).save(gameCaptor.capture());
 
@@ -123,8 +123,8 @@ class GameServiceTest {
 		assertEquals(GameStatus.IN_PROGRESS, savedGame.getStatus());
 		assertEquals(0, savedGame.getAttemptsUsed());
 
-		assertEquals("GAME_IN_PROGRESS", response.getStatus());
-		assertEquals(1, response.getGameLevel());
+		assertEquals(GameStatus.IN_PROGRESS, response.getStatus());
+		assertEquals(GameLevel.EASY, response.getGameLevel());
 		assertEquals(4, response.getNumberOfColumnColors());
 		assertEquals(GameEngine.MAX_ATTEMPTS, response.getMaximumOfattempts());
 		assertEquals(false, response.isRepeatedColorAllowed());
@@ -136,7 +136,7 @@ class GameServiceTest {
 		when(userRepository.findById(10L)).thenReturn(Optional.empty());
 
 		UnauthorizedException exception = assertThrows(UnauthorizedException.class,
-				() -> gameService.createGame(10L, 1));
+				() -> gameService.createGame(10L, GameLevel.EASY));
 
 		assertEquals("Usuário não autenticado", exception.getMessage());
 	}
@@ -148,7 +148,7 @@ class GameServiceTest {
 				.thenReturn(Optional.of(inProgressGame));
 
 		GameFlowException exception = assertThrows(GameFlowException.class,
-				() -> gameService.createGame(10L, 1));
+				() -> gameService.createGame(10L, GameLevel.EASY));
 
 		assertEquals("Já existe um jogo em andamento, não é possível iniciar um novo enquanto houver outro em andamento",
 				exception.getMessage());
@@ -172,8 +172,8 @@ class GameServiceTest {
 
 		assertInstanceOf(GameInProgressResponse.class, response);
 		GameInProgressResponse inProgressResponse = (GameInProgressResponse) response;
-		assertEquals("GAME_IN_PROGRESS", inProgressResponse.getStatus());
-		assertEquals(1, inProgressResponse.getGameLevel());
+		assertEquals(GameStatus.IN_PROGRESS, inProgressResponse.getStatus());
+		assertEquals(GameLevel.EASY, inProgressResponse.getGameLevel());
 		assertEquals(2, inProgressResponse.getTips().getCorrectPositions());
 		assertEquals(1, inProgressResponse.getTips().getCorrectColors());
 
@@ -207,8 +207,8 @@ class GameServiceTest {
 
 		assertInstanceOf(GameEndResponse.class, response);
 		GameEndResponse endResponse = (GameEndResponse) response;
-		assertEquals("GAME_WIN", endResponse.getStatus());
-		assertEquals(1, endResponse.getGameLevel());
+		assertEquals(GameStatus.WON, endResponse.getStatus());
+		assertEquals(GameLevel.EASY, endResponse.getGameLevel());
 		assertEquals(List.of(1, 2, 3, 4), endResponse.getSecret());
 		assertEquals(GameStatus.WON, inProgressGame.getStatus());
 		assertNotNull(inProgressGame.getFinishedAt());
@@ -232,8 +232,8 @@ class GameServiceTest {
 
 		assertInstanceOf(GameEndResponse.class, response);
 		GameEndResponse endResponse = (GameEndResponse) response;
-		assertEquals("GAME_OVER", endResponse.getStatus());
-		assertEquals(1, endResponse.getGameLevel());
+		assertEquals(GameStatus.LOST, endResponse.getStatus());
+		assertEquals(GameLevel.EASY, endResponse.getGameLevel());
 		assertEquals(List.of(1, 2, 3, 4), endResponse.getSecret());
 		assertEquals(GameStatus.LOST, inProgressGame.getStatus());
 		assertNotNull(inProgressGame.getFinishedAt());
@@ -273,8 +273,8 @@ class GameServiceTest {
 
 		GameEndResponse response = gameService.giveUp(10L);
 
-		assertEquals("GAME_GIVE_UP", response.getStatus());
-		assertEquals(1, response.getGameLevel());
+		assertEquals(GameStatus.GAVE_UP, response.getStatus());
+		assertEquals(GameLevel.EASY, response.getGameLevel());
 		assertEquals(List.of(1, 2, 3, 4), response.getSecret());
 		assertEquals(GameStatus.GAVE_UP, inProgressGame.getStatus());
 		assertNotNull(inProgressGame.getFinishedAt());
@@ -330,8 +330,8 @@ class GameServiceTest {
 
 		assertTrue(responseOpt.isPresent());
 		GameStatusResponse response = responseOpt.get();
-		assertEquals("GAME_IN_PROGRESS", response.getStatus());
-		assertEquals(1, response.getGameLevel());
+		assertEquals(GameStatus.IN_PROGRESS, response.getStatus());
+		assertEquals(GameLevel.EASY, response.getGameLevel());
 		assertEquals(4, response.getNumberOfColumnColors());
 		assertEquals(GameEngine.MAX_ATTEMPTS, response.getMaximumOfattempts());
 		assertEquals(false, response.isRepeatedColorAllowed());

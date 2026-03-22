@@ -16,9 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 
 import com.quazzom.mastermind.controller.UserController;
+import com.quazzom.mastermind.dto.GameFullResponse;
+import com.quazzom.mastermind.dto.GameHistoryResponse;
 import com.quazzom.mastermind.dto.UserPasswordRequest;
 import com.quazzom.mastermind.dto.UserProfileRequest;
 import com.quazzom.mastermind.dto.UserProfileResponse;
+import com.quazzom.mastermind.entity.GameLevel;
+import com.quazzom.mastermind.entity.GameStatus;
 import com.quazzom.mastermind.entity.User;
 import com.quazzom.mastermind.exception.UnauthorizedException;
 import com.quazzom.mastermind.security.CustomUserDetails;
@@ -131,5 +135,42 @@ class UserControllerTest {
                 () -> userController.getProfile(authentication));
 
         assertEquals("Usuário não autenticado", exception.getMessage());
+    }
+
+    @Test
+    void getHistoryShouldReturnServiceData() {
+        UUID uuidPublic = UUID.randomUUID();
+        GameHistoryResponse expected = new GameHistoryResponse(java.util.List.of(), java.util.List.of());
+
+        when(authentication.getName()).thenReturn(uuidPublic.toString());
+        when(userService.getHistory(uuidPublic)).thenReturn(expected);
+
+        ResponseEntity<GameHistoryResponse> response = userController.getHistory(authentication);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expected, response.getBody());
+    }
+
+    @Test
+    void getGameByUuidPublicShouldReturnServiceData() {
+        UUID userUuidPublic = UUID.randomUUID();
+        UUID gameUuidPublic = UUID.randomUUID();
+
+        GameFullResponse expected = new GameFullResponse(
+                GameStatus.IN_PROGRESS,
+                GameLevel.EASY,
+                4,
+                10,
+                false,
+				java.util.List.of(),
+                java.util.List.of());
+
+        when(authentication.getName()).thenReturn(userUuidPublic.toString());
+        when(userService.getUserGameThatIsNotInProgress(userUuidPublic, gameUuidPublic)).thenReturn(expected);
+
+        ResponseEntity<GameFullResponse> response = userController.getGameByUuidPublic(authentication, gameUuidPublic);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expected, response.getBody());
     }
 }

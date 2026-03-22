@@ -1,14 +1,13 @@
 package com.quazzom.mastermind.unit.exception;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.quazzom.mastermind.exception.ApiException;
 import com.quazzom.mastermind.exception.GlobalExceptionHandler;
@@ -59,7 +58,7 @@ class GlobalExceptionHandlerTest {
 
         assertEquals(400, response.getStatusCode().value());
         Map<?, ?> body = (Map<?, ?>) response.getBody();
-        assertEquals("Corpo da requisição vazio ou em um formato inválido. Ele deve ser um JSON válido contendo os campos esperados.", body.get("error"));
+        assertEquals("Corpo da requisição vazio ou em um formato inválido. Ele deve ser um JSON válido contendo os campos esperados e com os valores e tipos corretos.", body.get("error"));
         assertEquals(400, body.get("status"));
     }
 

@@ -22,9 +22,9 @@ public class CalcGamePoints {
 
         GameHistoryItemResponse item = new GameHistoryItemResponse(
                 game.getUuidPublic(),
-				game.getLevel().ordinal() + 1,
+				game.getLevel(),
 				points,
-				game.getStatus().ordinal() + 1,
+				game.getStatus(),
 				game.getAttemptsUsed(),
 				game.getCreatedAt(),
 				game.getFinishedAt());

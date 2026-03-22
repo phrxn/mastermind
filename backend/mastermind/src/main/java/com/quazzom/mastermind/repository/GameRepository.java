@@ -2,6 +2,7 @@ package com.quazzom.mastermind.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +16,8 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     List<Game> findByUserId(Long userId);
 
     Optional<Game> findFirstByUserIdAndStatusOrderByCreatedAtDesc(Long userId, GameStatus status);
+
+	Optional<Game> findByUserIdAndUuidPublicAndStatusNot(Long userId, UUID uuidPublic, GameStatus status);
 
     @Query("""
 		SELECT g

@@ -35,8 +35,8 @@ class CalcGamePointsTest {
         GameHistoryItemResponse result = calcGamePoints.calculatePoints(game);
 
         assertEquals(100, result.getPointsMaked());
-        assertEquals(2, result.getStatus());
-        assertEquals(1, result.getLevel());
+        assertEquals(GameStatus.WON, result.getStatus());
+        assertEquals(GameLevel.EASY, result.getLevel());
         assertEquals(game.getAttemptsUsed(), result.getAttemptsUsed());
     }
 
@@ -53,8 +53,8 @@ class CalcGamePointsTest {
         GameHistoryItemResponse result = calcGamePoints.calculatePoints(game);
 
         assertEquals(0, result.getPointsMaked());
-        assertEquals(3, result.getStatus());
-        assertEquals(1, result.getLevel());
+        assertEquals(GameStatus.LOST, result.getStatus());
+        assertEquals(GameLevel.EASY, result.getLevel());
         assertEquals(game.getAttemptsUsed(), result.getAttemptsUsed());
     }
 
@@ -71,8 +71,8 @@ class CalcGamePointsTest {
         GameHistoryItemResponse result = calcGamePoints.calculatePoints(game);
 
         assertEquals(0, result.getPointsMaked());
-        assertEquals(4, result.getStatus());
-        assertEquals(1, result.getLevel());
+        assertEquals(GameStatus.GAVE_UP, result.getStatus());
+        assertEquals(GameLevel.EASY, result.getLevel());
         assertEquals(game.getAttemptsUsed(), result.getAttemptsUsed());
     }
 
@@ -89,8 +89,8 @@ class CalcGamePointsTest {
         GameHistoryItemResponse result = calcGamePoints.calculatePoints(game);
 
         assertEquals(0, result.getPointsMaked());
-        assertEquals(1, result.getStatus());
-        assertEquals(1, result.getLevel());
+        assertEquals(GameStatus.IN_PROGRESS, result.getStatus());
+        assertEquals(GameLevel.EASY, result.getLevel());
         assertEquals(game.getAttemptsUsed(), result.getAttemptsUsed());
     }
 
@@ -107,8 +107,8 @@ class CalcGamePointsTest {
         GameHistoryItemResponse result = calcGamePoints.calculatePoints(game);
 
         assertEquals(1563, result.getPointsMaked());
-        assertEquals(2, result.getStatus());
-        assertEquals(4, result.getLevel());
+        assertEquals(GameStatus.WON, result.getStatus());
+        assertEquals(GameLevel.MASTERMIND, result.getLevel());
         assertEquals(game.getAttemptsUsed(), result.getAttemptsUsed());
     }
 }

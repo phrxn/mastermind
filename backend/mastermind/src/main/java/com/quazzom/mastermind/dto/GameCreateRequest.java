@@ -1,14 +1,16 @@
 package com.quazzom.mastermind.dto;
 
+import com.quazzom.mastermind.entity.GameLevel;
+
 public class GameCreateRequest {
 
-	private Integer level;
+	private GameLevel level;
 
-	public Integer getLevel() {
+	public GameLevel getLevel() {
 		return level;
 	}
 
-	public void setLevel(Integer level) {
+	public void setLevel(GameLevel level) {
 		this.level = level;
 	}
 }

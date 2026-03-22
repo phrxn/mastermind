@@ -41,7 +41,7 @@ public class GameService {
 
     private final GameBusinessRole gameBusinessRole;
 
-	private final SecretDecoder secretDecoder;
+    private final SecretDecoder secretDecoder;
 
     private final ConcurrentHashMap<Long, List<Integer>> inMemorySecretsByGameId = new ConcurrentHashMap<>();
 
@@ -60,7 +60,7 @@ public class GameService {
         this.secretDecoder = secretDecoder;
     }
 
-    public GameStatusResponse createGame(Long userId, Integer level) {
+    public GameStatusResponse createGame(Long userId, GameLevel level) {
 
         User user = findAuthenticatedUser(userId);
 
@@ -89,8 +89,8 @@ public class GameService {
         Game gameSaved = gameRepository.save(game);
         inMemorySecretsByGameId.put(gameSaved.getId(), new ArrayList<>(secret));
 
-        return new GameStatusResponse("GAME_IN_PROGRESS",
-                levelFromEnum(gameSaved.getLevel()),
+        return new GameStatusResponse(GameStatus.IN_PROGRESS,
+                gameSaved.getLevel(),
                 gameSaved.getCodeLength(),
                 GameEngine.MAX_ATTEMPTS,
                 gameSaved.getAllowDuplicates(),
@@ -126,7 +126,7 @@ public class GameService {
             gameRepository.save(game);
             inMemorySecretsByGameId.remove(game.getId());
 
-            return new GameEndResponse("GAME_WIN", levelFromEnum(game.getLevel()), secret);
+            return new GameEndResponse(GameStatus.WON, game.getLevel(), secret);
         }
 
         if (nextAttemptNumber >= GameEngine.MAX_ATTEMPTS) {
@@ -135,11 +135,11 @@ public class GameService {
             gameRepository.save(game);
             inMemorySecretsByGameId.remove(game.getId());
 
-            return new GameEndResponse("GAME_OVER", levelFromEnum(game.getLevel()), secret);
+            return new GameEndResponse(GameStatus.LOST, game.getLevel(), secret);
         }
 
         gameRepository.save(game);
-        return new GameInProgressResponse("GAME_IN_PROGRESS", levelFromEnum(game.getLevel()), result);
+        return new GameInProgressResponse(GameStatus.IN_PROGRESS, game.getLevel(), result);
     }
 
     public GameEndResponse giveUp(Long userId) {
@@ -159,7 +159,7 @@ public class GameService {
         gameRepository.save(game);
         inMemorySecretsByGameId.remove(game.getId());
 
-        return new GameEndResponse("GAME_GIVE_UP", levelFromEnum(game.getLevel()), secret);
+        return new GameEndResponse(GameStatus.GAVE_UP, game.getLevel(), secret);
     }
 
     public Optional<GameStatusResponse> status(Long userId) {
@@ -183,8 +183,8 @@ public class GameService {
                 .collect(Collectors.toList());
 
         GameStatusResponse response = new GameStatusResponse(
-                "GAME_IN_PROGRESS",
-                levelFromEnum(game.getLevel()),
+                GameStatus.IN_PROGRESS,
+                game.getLevel(),
                 game.getCodeLength(),
                 GameEngine.MAX_ATTEMPTS,
                 game.getAllowDuplicates(),
@@ -205,36 +205,23 @@ public class GameService {
                 "Não existe nenhum jogo em andamento, não é possível fazer essa operação"));
     }
 
-    private LevelConfig levelConfig(Integer level) {
+    private LevelConfig levelConfig(GameLevel level) {
 
         if (level == null) {
             throw new GameFlowException("Nível é obrigatório");
         }
 
         return switch (level) {
-            case 1 ->
+            case EASY ->
                 new LevelConfig(GameLevel.EASY, 4, false);
-            case 2 ->
+            case NORMAL ->
                 new LevelConfig(GameLevel.NORMAL, 4, true);
-            case 3 ->
+            case HARD ->
                 new LevelConfig(GameLevel.HARD, 6, false);
-            case 4 ->
+            case MASTERMIND ->
                 new LevelConfig(GameLevel.MASTERMIND, 6, true);
             default ->
-                throw new GameFlowException("Nível inválido. Use 1, 2, 3 ou 4");
-        };
-    }
-
-    private int levelFromEnum(GameLevel level) {
-        return switch (level) {
-            case EASY ->
-                1;
-            case NORMAL ->
-                2;
-            case HARD ->
-                3;
-            case MASTERMIND ->
-                4;
+                throw new GameFlowException("Nível inválido. Use EASY, NORMAL, HARD ou MASTERMIND");
         };
     }
 

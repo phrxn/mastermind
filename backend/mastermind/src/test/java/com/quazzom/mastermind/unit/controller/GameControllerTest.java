@@ -21,6 +21,8 @@ import com.quazzom.mastermind.dto.GameCreateRequest;
 import com.quazzom.mastermind.dto.GameEndResponse;
 import com.quazzom.mastermind.dto.GameGuessRequest;
 import com.quazzom.mastermind.dto.GameStatusResponse;
+import com.quazzom.mastermind.entity.GameLevel;
+import com.quazzom.mastermind.entity.GameStatus;
 import com.quazzom.mastermind.entity.User;
 import com.quazzom.mastermind.exception.UnauthorizedException;
 import com.quazzom.mastermind.security.CustomUserDetails;
@@ -42,11 +44,11 @@ class GameControllerTest {
 	@Test
 	void createGameShouldReturnCreatedWhenLevelIsValid() {
 		GameCreateRequest request = new GameCreateRequest();
-		request.setLevel(1);
-		GameStatusResponse expected = new GameStatusResponse("GAME_IN_PROGRESS", 1, 4, 10, false, new ArrayList<>());
+		request.setLevel(GameLevel.EASY);
+		GameStatusResponse expected = new GameStatusResponse(GameStatus.IN_PROGRESS, GameLevel.EASY, 4, 10, false, new ArrayList<>());
 
 		when(authentication.getName()).thenReturn("10");
-		when(gameService.createGame(10L, 1)).thenReturn(expected);
+		when(gameService.createGame(10L, GameLevel.EASY)).thenReturn(expected);
 
 		ResponseEntity<GameStatusResponse> response = gameController.createGame(request, authentication);
 
@@ -61,11 +63,11 @@ class GameControllerTest {
 		CustomUserDetails customUserDetails = new CustomUserDetails(user);
 
 		GameCreateRequest request = new GameCreateRequest();
-		request.setLevel(2);
-		GameStatusResponse expected = new GameStatusResponse("GAME_IN_PROGRESS", 2, 4, 10, true, new ArrayList<>());
+		request.setLevel(GameLevel.NORMAL);
+		GameStatusResponse expected = new GameStatusResponse(GameStatus.IN_PROGRESS, GameLevel.NORMAL, 4, 10, true, new ArrayList<>());
 
 		when(authentication.getPrincipal()).thenReturn(customUserDetails);
-		when(gameService.createGame(25L, 2)).thenReturn(expected);
+		when(gameService.createGame(25L, GameLevel.NORMAL)).thenReturn(expected);
 
 		ResponseEntity<GameStatusResponse> response = gameController.createGame(request, authentication);
 
@@ -78,7 +80,7 @@ class GameControllerTest {
 	void makeGuessShouldReturnOkWhenGuessIsValid() {
 		GameGuessRequest request = new GameGuessRequest();
 		request.setGuess(List.of(1, 2, 3, 4));
-		GameEndResponse expected = new GameEndResponse("GAME_IN_PROGRESS", 1, List.of(1, 2, 3, 4));
+		GameEndResponse expected = new GameEndResponse(GameStatus.IN_PROGRESS, GameLevel.EASY, List.of(1, 2, 3, 4));
 
 		when(authentication.getName()).thenReturn("15");
 		when(gameService.makeGuess(15L, List.of(1, 2, 3, 4))).thenReturn(expected);
@@ -92,7 +94,7 @@ class GameControllerTest {
 	// ===== giveUp =====
 	@Test
 	void giveUpShouldReturnOkWhenGameExistsAndGiveUp() {
-		GameEndResponse expected = new GameEndResponse("GAME_GIVE_UP", 1, List.of(1, 2, 3, 4));
+		GameEndResponse expected = new GameEndResponse(GameStatus.GAVE_UP, GameLevel.EASY, List.of(1, 2, 3, 4));
 
 		when(authentication.getName()).thenReturn("20");
 		when(gameService.giveUp(20L)).thenReturn(expected);
@@ -116,7 +118,7 @@ class GameControllerTest {
 
 	@Test
 	void statusShouldReturnOkWhenGameInProgress() {
-		GameStatusResponse expected = new GameStatusResponse("GAME_IN_PROGRESS", 2, 4, 10, true, new ArrayList<>());
+		GameStatusResponse expected = new GameStatusResponse(GameStatus.IN_PROGRESS, GameLevel.NORMAL, 4, 10, true, new ArrayList<>());
 
 		when(authentication.getName()).thenReturn("35");
 		when(gameService.status(35L)).thenReturn(Optional.of(expected));
@@ -131,7 +133,7 @@ class GameControllerTest {
 	@Test
 	void createGameShouldThrowUnauthorizedWhenAuthenticationIsInvalid() {
 		GameCreateRequest request = new GameCreateRequest();
-		request.setLevel(1);
+		request.setLevel(GameLevel.EASY);
 
 		when(authentication.getPrincipal()).thenReturn("invalidPrincipal");
 		when(authentication.getName()).thenReturn("invalidName");

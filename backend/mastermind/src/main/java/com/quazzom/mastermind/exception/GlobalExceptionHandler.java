@@ -1,11 +1,12 @@
 package com.quazzom.mastermind.exception;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-
 import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -23,7 +24,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<?> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
 
-		String errorMessage = "Corpo da requisição vazio ou em um formato inválido. Ele deve ser um JSON válido contendo os campos esperados.";
+		String errorMessage = "Corpo da requisição vazio ou em um formato inválido. Ele deve ser um JSON válido contendo os campos esperados e com os valores e tipos corretos.";
 
 		return ResponseEntity
 				.status(400)

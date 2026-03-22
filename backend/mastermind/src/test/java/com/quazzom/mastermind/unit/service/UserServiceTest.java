@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.quazzom.mastermind.dto.GameFullResponse;
 import com.quazzom.mastermind.dto.GameHistoryResponse;
 import com.quazzom.mastermind.dto.UserPasswordRequest;
 import com.quazzom.mastermind.dto.UserProfileRequest;
@@ -27,11 +28,15 @@ import com.quazzom.mastermind.dto.UserProfileResponse;
 import com.quazzom.mastermind.entity.Game;
 import com.quazzom.mastermind.entity.GameLevel;
 import com.quazzom.mastermind.entity.GameStatus;
+import com.quazzom.mastermind.entity.Guess;
 import com.quazzom.mastermind.entity.User;
+import com.quazzom.mastermind.exception.GameNotFoundException;
 import com.quazzom.mastermind.exception.UnauthorizedException;
 import com.quazzom.mastermind.repository.GameRepository;
+import com.quazzom.mastermind.repository.GuessRepository;
 import com.quazzom.mastermind.repository.UserRepository;
 import com.quazzom.mastermind.service.UserService;
+import com.quazzom.mastermind.utils.SecretDecoder;
 import com.quazzom.mastermind.validator.UserPasswordRequestValidator;
 import com.quazzom.mastermind.validator.UserProfileRequestValidator;
 
@@ -45,6 +50,9 @@ class UserServiceTest {
     private GameRepository gameRepository;
 
     @Mock
+    private GuessRepository guessRepository;
+
+    @Mock
     private UserProfileRequestValidator userProfileRequestValidator;
 
     @Mock
@@ -52,6 +60,9 @@ class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private SecretDecoder secretDecoder;
 
     @InjectMocks
     private UserService userService;
@@ -235,6 +246,68 @@ class UserServiceTest {
 
         UnauthorizedException exception = assertThrows(UnauthorizedException.class,
                 () -> userService.getHistory(uuidPublic));
+
+        assertEquals("Usuário não autenticado", exception.getMessage());
+    }
+
+    @Test
+    void getUserGameThatIsNotInProgressShouldReturnGameStatusWithRows() {
+        UUID gameUuidPublic = UUID.randomUUID();
+
+        Game game = new Game();
+        game.setId(100L);
+        game.setUuidPublic(gameUuidPublic);
+        game.setLevel(GameLevel.HARD);
+		game.setStatus(GameStatus.IN_PROGRESS);
+        game.setCodeLength(6);
+        game.setAllowDuplicates(false);
+
+        Guess guess = new Guess();
+        guess.setAttemptNumber(1);
+        guess.setGuess("1,2,3,4,5,6");
+        guess.setCorrectPositions(2);
+        guess.setCorrectColors(1);
+
+        when(userRepository.findByUuidPublic(uuidPublic)).thenReturn(Optional.of(user));
+        when(gameRepository.findByUserIdAndUuidPublicAndStatusNot(user.getId(), gameUuidPublic, GameStatus.IN_PROGRESS))
+                .thenReturn(Optional.of(game));
+        when(guessRepository.findByGameIdOrderByAttemptNumberAsc(game.getId())).thenReturn(List.of(guess));
+        when(secretDecoder.decode("1,2,3,4,5,6")).thenReturn(List.of(1, 2, 3, 4, 5, 6));
+
+        GameFullResponse response = userService.getUserGameThatIsNotInProgress(uuidPublic, gameUuidPublic);
+
+        assertEquals(GameStatus.IN_PROGRESS, response.getStatus());
+        assertEquals(GameLevel.HARD, response.getGameLevel());
+        assertEquals(6, response.getNumberOfColumnColors());
+        assertEquals(10, response.getMaximumOfattempts());
+        assertEquals(1, response.getRows().size());
+        assertEquals(List.of(1, 2, 3, 4, 5, 6), response.getRows().get(0).getGuess());
+        assertEquals(2, response.getRows().get(0).getTips().getCorrectPositions());
+        assertEquals(1, response.getRows().get(0).getTips().getCorrectColors());
+    }
+
+    @Test
+    void getUserGameThatIsNotInProgressShouldThrowWhenGameNotFound() {
+        UUID gameUuidPublic = UUID.randomUUID();
+
+        when(userRepository.findByUuidPublic(uuidPublic)).thenReturn(Optional.of(user));
+        when(gameRepository.findByUserIdAndUuidPublicAndStatusNot(user.getId(), gameUuidPublic, GameStatus.IN_PROGRESS))
+                .thenReturn(Optional.empty());
+
+        GameNotFoundException exception = assertThrows(GameNotFoundException.class,
+                () -> userService.getUserGameThatIsNotInProgress(uuidPublic, gameUuidPublic));
+
+        assertEquals("O jogo não existe ou ainda está com o estado IN_PROGRESS", exception.getMessage());
+    }
+
+    @Test
+    void getUserGameThatIsNotInProgressShouldThrowWhenUserIsNotAuthenticated() {
+        UUID gameUuidPublic = UUID.randomUUID();
+
+        when(userRepository.findByUuidPublic(uuidPublic)).thenReturn(Optional.empty());
+
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class,
+                () -> userService.getUserGameThatIsNotInProgress(uuidPublic, gameUuidPublic));
 
         assertEquals("Usuário não autenticado", exception.getMessage());
     }

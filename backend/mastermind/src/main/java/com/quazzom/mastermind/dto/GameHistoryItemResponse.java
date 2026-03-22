@@ -3,17 +3,20 @@ package com.quazzom.mastermind.dto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.quazzom.mastermind.entity.GameLevel;
+import com.quazzom.mastermind.entity.GameStatus;
+
 public class GameHistoryItemResponse {
 
 	private final UUID publicUuid;
-	private final Integer level;
+	private final GameLevel level;
 	private final Integer pointsMaked;
-	private final Integer status;
+	private final GameStatus status;
 	private final Integer attemptsUsed;
 	private final LocalDateTime createdAt;
 	private final LocalDateTime finishedAt;
 
-	public GameHistoryItemResponse(UUID publicUuid, Integer level, Integer pointsMaked, Integer status, Integer attemptsUsed, LocalDateTime createdAt, LocalDateTime finishedAt) {
+	public GameHistoryItemResponse(UUID publicUuid, GameLevel level, Integer pointsMaked, GameStatus status, Integer attemptsUsed, LocalDateTime createdAt, LocalDateTime finishedAt) {
 		this.publicUuid = publicUuid;
 		this.level = level;
 		this.pointsMaked = pointsMaked;
@@ -28,7 +31,7 @@ public class GameHistoryItemResponse {
 		return publicUuid;
 	}
 
-	public Integer getLevel() {
+	public GameLevel getLevel() {
 		return level;
 	}
 
@@ -36,7 +39,7 @@ public class GameHistoryItemResponse {
 		return pointsMaked;
 	}
 
-	public Integer getStatus() {
+	public GameStatus getStatus() {
 		return status;
 	}
 

@@ -2,6 +2,7 @@ package com.quazzom.mastermind.integration.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -215,6 +216,101 @@ public class GameRepositoryIntegrationTest {
         // Ensure all are from user1
         assertTrue(result.stream().allMatch(g -> g.getUser().getId().equals(user1.getId())));
     }
+
+
+
+
+
+
+    @Test
+    void shouldFindGameWhenStatusIsDifferent() {
+
+        User user = createUser("User 1", "user1@email.com", "user1", 25, "123");
+		userRepository.save(user);
+
+        Game game = gameRepository.save(createGame(user, GameLevel.EASY, 3, GameStatus.WON, LocalDateTime.now()));
+
+
+        Optional<Game> result = gameRepository
+            .findByUserIdAndUuidPublicAndStatusNot(
+                user.getId(),
+                game.getUuidPublic(),
+                GameStatus.IN_PROGRESS
+            );
+
+        assertTrue(result.isPresent());
+        assertEquals(game.getId(), result.get().getId());
+    }
+
+    @Test
+    void shouldReturnEmpty_whenStatusIsSame() {
+
+        User user = createUser("User 1", "user1@email.com", "user1", 25, "123");
+		userRepository.save(user);
+
+        Game game = gameRepository.save(
+            createGame(user, GameLevel.EASY, 3, GameStatus.WON, LocalDateTime.now())
+        );
+
+        Optional<Game> result = gameRepository
+            .findByUserIdAndUuidPublicAndStatusNot(
+                user.getId(),
+                game.getUuidPublic(),
+                GameStatus.WON
+            );
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void shouldReturnEmpty_whenUserIdDoesNotMatch() {
+
+        User user1 =  createUser("User 1", "user1@email.com", "user1", 25, "123");
+		userRepository.save(user1);
+        User user2 =  createUser("User 2", "user2@email.com", "user2", 30, "123");
+		userRepository.save(user2);
+
+        Game game = gameRepository.save(
+            createGame(user1, GameLevel.EASY, 3, GameStatus.WON, LocalDateTime.now())
+        );
+
+        Optional<Game> result = gameRepository
+            .findByUserIdAndUuidPublicAndStatusNot(
+                user2.getId(), // wrong user
+                game.getUuidPublic(),
+                GameStatus.IN_PROGRESS
+            );
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void shouldReturnEmpty_whenUuidDoesNotMatch() {
+
+        User user = createUser("User 1", "user1@email.com", "user1", 25, "123");
+		userRepository.save(user);
+
+        gameRepository.save(createGame(user, GameLevel.EASY, 3, GameStatus.WON, LocalDateTime.now()));
+
+        Optional<Game> result = gameRepository
+            .findByUserIdAndUuidPublicAndStatusNot(
+                user.getId(),
+                new java.util.UUID(0L, 0L), // wrong uuid
+                GameStatus.IN_PROGRESS
+            );
+
+        assertTrue(result.isEmpty());
+    }
+
+    private User createUser(String username, String email, String nickname, Integer age, String password) {
+		User user = new User();
+		user.setName(username);
+		user.setEmail(email);
+		user.setNickname(nickname);
+		user.setAge(age);
+		user.setPassword(password);
+		return user;
+	}
 
     private Game createGame(User user, GameLevel level, int attempts, GameStatus status, LocalDateTime createdAt) {
         Game g = new Game();
