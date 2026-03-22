@@ -1,16 +1,22 @@
 package com.quazzom.mastermind.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.quazzom.mastermind.dto.GameHistoryItemResponse;
+import com.quazzom.mastermind.dto.GameHistoryResponse;
 import com.quazzom.mastermind.dto.UserPasswordRequest;
 import com.quazzom.mastermind.dto.UserProfileRequest;
 import com.quazzom.mastermind.dto.UserProfileResponse;
+import com.quazzom.mastermind.entity.CalcGamePoints;
+import com.quazzom.mastermind.entity.Game;
 import com.quazzom.mastermind.entity.User;
 import com.quazzom.mastermind.exception.UnauthorizedException;
 import com.quazzom.mastermind.exception.UserAlreadyExistsException;
+import com.quazzom.mastermind.repository.GameRepository;
 import com.quazzom.mastermind.repository.UserRepository;
 import com.quazzom.mastermind.validator.UserPasswordRequestValidator;
 import com.quazzom.mastermind.validator.UserProfileRequestValidator;
@@ -19,15 +25,18 @@ import com.quazzom.mastermind.validator.UserProfileRequestValidator;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final GameRepository gameRepository;
     private final UserProfileRequestValidator userProfileRequestValidator;
     private final UserPasswordRequestValidator userPasswordRequestValidator;
     private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository,
+            GameRepository gameRepository,
             UserProfileRequestValidator userProfileRequestValidator,
             UserPasswordRequestValidator userPasswordRequestValidator,
             PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.gameRepository = gameRepository;
         this.userProfileRequestValidator = userProfileRequestValidator;
         this.userPasswordRequestValidator = userPasswordRequestValidator;
         this.passwordEncoder = passwordEncoder;
@@ -74,6 +83,27 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+    }
+
+    public GameHistoryResponse getHistory(UUID uuidPublic) {
+
+        User user = getAuthenticatedUser(uuidPublic);
+
+        List<Game> userTopGamesByLevel = gameRepository.findBestGamesPerLevel(user.getId());
+        List<Game> userGameHistory = gameRepository.findHistoryByUserId(user.getId());
+
+        CalcGamePoints calcGamePoints = new CalcGamePoints();
+
+        List<GameHistoryItemResponse> gameHistoryBestGames = userTopGamesByLevel.stream()
+                .map(game -> calcGamePoints.calculatePoints(game))
+                .toList();
+
+        List<GameHistoryItemResponse> gameHistoryFull = userGameHistory.stream()
+                .map(game -> calcGamePoints.calculatePoints(game))
+                .toList();
+
+        return new GameHistoryResponse(gameHistoryBestGames, gameHistoryFull);
+
     }
 
     private User getAuthenticatedUser(UUID uuidPublic) {

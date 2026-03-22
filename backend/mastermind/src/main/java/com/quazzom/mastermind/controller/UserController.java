@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.quazzom.mastermind.dto.GameHistoryResponse;
 import com.quazzom.mastermind.dto.UserPasswordRequest;
 import com.quazzom.mastermind.dto.UserProfileRequest;
 import com.quazzom.mastermind.dto.UserProfileResponse;
@@ -58,6 +59,12 @@ public class UserController {
         userService.updatePassword(uuidPublic, request);
         return ResponseEntity.noContent().build();
     }
+
+	@GetMapping("/history")
+	public ResponseEntity<GameHistoryResponse> getHistory(Authentication authentication) {
+		UUID uuidPublic = extractUserId(authentication);
+		return ResponseEntity.ok(userService.getHistory(uuidPublic));
+	}
 
     private UUID extractUserId(Authentication authentication) {
         Object principal = authentication.getPrincipal();

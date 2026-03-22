@@ -2,7 +2,6 @@ package com.quazzom.mastermind.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +29,7 @@ import com.quazzom.mastermind.exception.UnauthorizedException;
 import com.quazzom.mastermind.repository.GameRepository;
 import com.quazzom.mastermind.repository.GuessRepository;
 import com.quazzom.mastermind.repository.UserRepository;
+import com.quazzom.mastermind.utils.SecretDecoder;
 
 @Service
 public class GameService {
@@ -41,6 +41,8 @@ public class GameService {
 
     private final GameBusinessRole gameBusinessRole;
 
+	private final SecretDecoder secretDecoder;
+
     private final ConcurrentHashMap<Long, List<Integer>> inMemorySecretsByGameId = new ConcurrentHashMap<>();
 
     public GameService(
@@ -48,12 +50,14 @@ public class GameService {
             GuessRepository guessRepository,
             UserRepository userRepository,
             GameEngine gameEngine,
-            GameBusinessRole gameBusinessRole) {
+            GameBusinessRole gameBusinessRole,
+            SecretDecoder secretDecoder) {
         this.gameRepository = gameRepository;
         this.guessRepository = guessRepository;
         this.userRepository = userRepository;
         this.gameEngine = gameEngine;
         this.gameBusinessRole = gameBusinessRole;
+        this.secretDecoder = secretDecoder;
     }
 
     public GameStatusResponse createGame(Long userId, Integer level) {
@@ -78,7 +82,7 @@ public class GameService {
         game.setLevel(config.level());
         game.setCodeLength(config.codeLength());
         game.setAllowDuplicates(config.allowDuplicates());
-        game.setSecretCode(encode(secret));
+        game.setSecretCode(secretDecoder.encode(secret));
         game.setStatus(GameStatus.IN_PROGRESS);
         game.setAttemptsUsed(0);
 
@@ -109,7 +113,7 @@ public class GameService {
         Guess guess = new Guess();
         guess.setGame(game);
         guess.setAttemptNumber(nextAttemptNumber);
-        guess.setGuess(encode(guessValues));
+        guess.setGuess(secretDecoder.encode(guessValues));
         guess.setCorrectPositions(result.getCorrectPositions());
         guess.setCorrectColors(result.getCorrectColors());
         guessRepository.save(guess);
@@ -173,7 +177,7 @@ public class GameService {
         List<GameStatusRowResponse> rows = guesses.stream()
                 .map(item
                         -> new GameStatusRowResponse(
-                        decode(item.getGuess()),
+                        secretDecoder.decode(item.getGuess()),
                         new GameEngineResult(item.getCorrectPositions(), item.getCorrectColors())
                 ))
                 .collect(Collectors.toList());
@@ -235,23 +239,7 @@ public class GameService {
     }
 
     private List<Integer> getSecretInMemory(Game game) {
-        return inMemorySecretsByGameId.computeIfAbsent(game.getId(), ignored -> decode(game.getSecretCode()));
-    }
-
-    private String encode(List<Integer> values) {
-        return values.stream().map(String::valueOf).collect(Collectors.joining(","));
-    }
-
-    private List<Integer> decode(String value) {
-        if (value == null || value.isBlank()) {
-            return List.of();
-        }
-
-        return Arrays.stream(value.split(","))
-                .map(String::trim)
-                .filter(item -> !item.isBlank())
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
+        return inMemorySecretsByGameId.computeIfAbsent(game.getId(), ignored -> secretDecoder.decode(game.getSecretCode()));
     }
 
     private record LevelConfig(GameLevel level, int codeLength, boolean allowDuplicates) {

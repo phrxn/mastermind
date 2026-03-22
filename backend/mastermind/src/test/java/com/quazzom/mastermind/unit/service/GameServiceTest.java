@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -39,6 +40,7 @@ import com.quazzom.mastermind.repository.GameRepository;
 import com.quazzom.mastermind.repository.GuessRepository;
 import com.quazzom.mastermind.repository.UserRepository;
 import com.quazzom.mastermind.service.GameService;
+import com.quazzom.mastermind.utils.SecretDecoder;
 
 @ExtendWith(MockitoExtension.class)
 class GameServiceTest {
@@ -60,6 +62,9 @@ class GameServiceTest {
 
 	@InjectMocks
 	private GameService gameService;
+
+	@Mock
+	private SecretDecoder secretDecoder;
 
 	@Captor
 	private ArgumentCaptor<Game> gameCaptor;
@@ -91,6 +96,8 @@ class GameServiceTest {
 	// ===== createGame =====
 	@Test
 	void createGameShouldCreateAndReturnGameInProgress() {
+
+		when(secretDecoder.encode(anyList())).thenReturn("1,2,3,4");
 		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
 				.thenReturn(Optional.empty());
@@ -153,6 +160,8 @@ class GameServiceTest {
 		List<Integer> guessValues = List.of(1, 2, 4, 6);
 		GameEngineResult result = new GameEngineResult(2, 1);
 
+		when(secretDecoder.decode("1,2,3,4")).thenReturn(List.of(1, 2, 3, 4));
+		when(secretDecoder.encode(guessValues)).thenReturn("1,2,4,6");
 		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
 				.thenReturn(Optional.of(inProgressGame));
@@ -186,6 +195,8 @@ class GameServiceTest {
 		List<Integer> guessValues = List.of(1, 2, 3, 4);
 		GameEngineResult result = new GameEngineResult(4, 0);
 
+		when(secretDecoder.decode("1,2,3,4")).thenReturn(List.of(1, 2, 3, 4));
+		when(secretDecoder.encode(anyList())).thenReturn("1,2,3,4");
 		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
 				.thenReturn(Optional.of(inProgressGame));
@@ -209,6 +220,8 @@ class GameServiceTest {
 		List<Integer> guessValues = List.of(6, 5, 4, 3);
 		GameEngineResult result = new GameEngineResult(0, 2);
 
+		when(secretDecoder.decode("1,2,3,4")).thenReturn(List.of(1, 2, 3, 4));
+		when(secretDecoder.encode(anyList())).thenReturn("6,5,4,3");
 		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
 				.thenReturn(Optional.of(inProgressGame));
@@ -252,6 +265,7 @@ class GameServiceTest {
 	// ===== giveUp =====
 	@Test
 	void giveUpShouldEndGameWithGaveUpStatus() {
+		when(secretDecoder.decode("1,2,3,4")).thenReturn(List.of(1, 2, 3, 4));
 		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
 				.thenReturn(Optional.of(inProgressGame));
@@ -305,6 +319,8 @@ class GameServiceTest {
 		guess2.setCorrectPositions(4);
 		guess2.setCorrectColors(0);
 
+		when(secretDecoder.decode("1,2,4,6")).thenReturn(List.of(1, 2, 4, 6));
+		when(secretDecoder.decode("1,2,3,4")).thenReturn(List.of(1, 2, 3, 4));
 		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
 				.thenReturn(Optional.of(inProgressGame));

@@ -1,11 +1,15 @@
 package com.quazzom.mastermind.entity;
 
 import java.time.LocalDateTime;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import org.hibernate.annotations.Generated;
+import org.hibernate.generator.EventType;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -24,6 +28,10 @@ public class Game {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
+	@Generated(event = EventType.INSERT)
+    @Column(name = "uuid_public", insertable = false, updatable = false, nullable = false, unique = true)
+    private UUID uuidPublic;
 
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
@@ -52,6 +60,14 @@ public class Game {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public void setUuidPublic(UUID uuidPublic) {
+		this.uuidPublic = uuidPublic;
+	}
+
+	public UUID getUuidPublic() {
+		return uuidPublic;
 	}
 
 	public User getUser() {
