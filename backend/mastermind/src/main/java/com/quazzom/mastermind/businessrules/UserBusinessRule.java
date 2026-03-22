@@ -73,7 +73,7 @@ public class UserBusinessRule extends User {
 			throw new RequestInvalidPropertyValueException("O email deve ter no máximo 50 caracteres");
 		}
 
-		if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+		if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{1,}$")) {
 			throw new RequestInvalidPropertyValueException(
 					"O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)");
 		}

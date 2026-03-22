@@ -1,11 +1,10 @@
 package com.quazzom.mastermind.unit.businessrules;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.time.LocalDateTime;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -157,11 +156,9 @@ class UserBusinessRuleTest {
 	}
 
 	@Test
-	void setEmailShouldFailWhenTldHasOneCharacter() {
-		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
-				() -> userBusinessRule.setEmail("a@b.c"));
-		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)",
-				exception.getMessage());
+	void setEmailShouldPassWhenTldHasOneCharacter() {
+		assertDoesNotThrow(() -> userBusinessRule.setEmail("a@b.c"));
+		assertEquals("a@b.c", userBusinessRule.getEmail());
 	}
 
 	@Test
