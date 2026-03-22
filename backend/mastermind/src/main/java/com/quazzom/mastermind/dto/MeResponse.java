@@ -1,11 +1,13 @@
 package com.quazzom.mastermind.dto;
 
+import java.util.UUID;
+
 import com.quazzom.mastermind.entity.User;
 
 public class MeResponse {
 
     private final boolean authenticated;
-    private final Long id;
+    private final UUID uuidPublic;
     private final String name;
     private final String email;
     private final String nickname;
@@ -13,7 +15,7 @@ public class MeResponse {
 
     public MeResponse(User user) {
         this.authenticated = true;
-        this.id = user.getId();
+        this.uuidPublic = user.getUuidPublic();
         this.name = user.getName();
         this.email = user.getEmail();
         this.nickname = user.getNickname();
@@ -24,8 +26,8 @@ public class MeResponse {
         return authenticated;
     }
 
-    public Long getId() {
-        return id;
+    public UUID getUuidPublic() {
+        return uuidPublic;
     }
 
     public String getName() {

@@ -10,6 +10,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -57,7 +59,6 @@ class AuthControllerTest {
                 UriComponentsBuilder.fromUriString("http://localhost"));
 
         assertEquals(HttpStatus.CREATED, actual.getStatusCode());
-        assertEquals("http://localhost/users/10", actual.getHeaders().getLocation().toString());
         assertSame(expected, actual.getBody());
         verify(userService).register(request);
     }
@@ -97,20 +98,22 @@ class AuthControllerTest {
     void meShouldReturnAuthenticatedUserData() {
         User user = new User();
         user.setId(10L);
+        UUID uuidPublic = UUID.randomUUID();
+        user.setUuidPublic(uuidPublic);
         user.setName("Maria Silva");
         user.setEmail("maria@teste.com");
         user.setNickname("maria");
         user.setAge(25);
         MeResponse expected = new MeResponse(user);
 
-        when(authentication.getName()).thenReturn("10");
-        when(userService.me(10L)).thenReturn(expected);
+        when(authentication.getName()).thenReturn(uuidPublic.toString());
+        when(userService.me(uuidPublic)).thenReturn(expected);
 
         ResponseEntity<MeResponse> actual = authController.me(authentication);
 
         assertEquals(HttpStatus.OK, actual.getStatusCode());
         assertTrue(actual.getBody().isAuthenticated());
         assertSame(expected, actual.getBody());
-        verify(userService).me(10L);
+		verify(userService).me(uuidPublic);
     }
 }

@@ -1,20 +1,22 @@
 package com.quazzom.mastermind.security;
 
 import java.io.IOException;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.quazzom.mastermind.service.JwtService;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -28,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-        protected void doFilterInternal(HttpServletRequest request,
+    protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
@@ -48,21 +50,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String subject = jwtService.extractSubject(token);
-        Long userId;
+        UUID uuidPublic;
         try {
-            userId = Long.parseLong(subject);
-        } catch (NumberFormatException ex) {
+            uuidPublic = UUID.fromString(subject);
+        } catch (IllegalArgumentException ex) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             response.getWriter().write("{\"error\":\"Token inválido\",\"status\":401}");
             return;
         }
 
-        CustomUserDetails user = (CustomUserDetails) customUserDetailsService.loadUserById(userId);
+        final CustomUserDetails user;
+        try {
+            user = (CustomUserDetails) customUserDetailsService.loadUserByUuidPublic(uuidPublic);
+        } catch (UsernameNotFoundException ex) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\":\"Token inválido\",\"status\":401}");
+            return;
+        }
+
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-            user,
+                user,
                 null,
-            user.getAuthorities());
+                user.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 

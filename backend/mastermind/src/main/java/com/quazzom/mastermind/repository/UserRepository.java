@@ -1,12 +1,13 @@
 package com.quazzom.mastermind.repository;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import com.quazzom.mastermind.entity.User;
 
@@ -16,6 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByNickname(String nickname);
     Optional<User> findByEmail(String email);
     Optional<User> findByNickname(String nickname);
+	Optional<User> findByUuidPublic(UUID uuidPublic);
 
     @Modifying
     @Transactional

@@ -1,6 +1,6 @@
 package com.quazzom.mastermind.controller;
 
-import java.net.URI;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -35,9 +35,8 @@ public class AuthController {
 			UriComponentsBuilder uriComponentsBuilder) {
 
 		RegisterResponse createdUser = userService.register(request);
-		URI location = uriComponentsBuilder.path("/users/{id}").buildAndExpand(createdUser.getId()).toUri();
 
-		return ResponseEntity.created(location).body(createdUser);
+		return ResponseEntity.status(201).body(createdUser);
 	}
 
 	@PostMapping("/login")
@@ -47,19 +46,19 @@ public class AuthController {
 
 	@GetMapping("/me")
 	public ResponseEntity<MeResponse> me(Authentication authentication) {
-		Long userId = extractUserId(authentication);
+		UUID userId = extractUserId(authentication);
 		return ResponseEntity.ok(userService.me(userId));
 	}
 
-	private Long extractUserId(Authentication authentication) {
+	private UUID extractUserId(Authentication authentication) {
 
 		Object principal = authentication.getPrincipal();
 		if (principal instanceof CustomUserDetails details) {
-			return details.getId();
+			return details.getUuidPublic();
 		}
 
 		try {
-			return Long.valueOf(authentication.getName());
+			return UUID.fromString(authentication.getName());
 		} catch (Exception ex) {
 			throw new UnauthorizedException("Usuário não autenticado");
 		}

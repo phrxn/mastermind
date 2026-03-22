@@ -1,5 +1,7 @@
 package com.quazzom.mastermind.service;
 
+import java.util.UUID;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -77,13 +79,13 @@ public class AuthService {
 			throw new UnauthorizedUserOrPasswordInvalidException();
 		}
 
-		String token = jwtService.generateToken(user.getId().intValue());
+		String token = jwtService.generateToken(user.getUuidPublic());
 		return new LoginResponse(token);
 	}
 
-	public MeResponse me(Long userId) {
+	public MeResponse me(UUID uuidPublic) {
 
-		User user = userRepository.findById(userId)
+		User user = userRepository.findByUuidPublic(uuidPublic)
 				.orElseThrow(() -> new UnauthorizedException("Usuário não autenticado"));
 
 		return new MeResponse(user);

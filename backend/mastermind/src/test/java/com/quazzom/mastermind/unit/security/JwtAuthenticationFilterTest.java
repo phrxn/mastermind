@@ -1,5 +1,7 @@
 package com.quazzom.mastermind.unit.security;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,6 +19,7 @@ import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.quazzom.mastermind.entity.User;
 import com.quazzom.mastermind.security.CustomUserDetails;
@@ -76,12 +79,12 @@ class JwtAuthenticationFilterTest {
 		assertEquals("application/json", response.getContentType());
 		assertEquals("{\"error\":\"Token inválido\",\"status\":401}", response.getContentAsString());
 		assertNull(SecurityContextHolder.getContext().getAuthentication());
-		verify(customUserDetailsService, never()).loadUserById(org.mockito.ArgumentMatchers.anyLong());
+		verify(customUserDetailsService, never()).loadUserByUuidPublic(org.mockito.ArgumentMatchers.any(UUID.class));
 	}
 
-	// ===== doFilterInternal (subject não numérico) =====
+	// ===== doFilterInternal (subject não é UUID válido) =====
 	@Test
-	void doFilterShouldReturnUnauthorizedWhenSubjectIsNotNumeric() throws Exception {
+	void doFilterShouldReturnUnauthorizedWhenSubjectIsNotValidUuid() throws Exception {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		request.addHeader("Authorization", "Bearer valid-token");
 		MockHttpServletResponse response = new MockHttpServletResponse();
@@ -96,7 +99,7 @@ class JwtAuthenticationFilterTest {
 		assertEquals("application/json", response.getContentType());
 		assertEquals("{\"error\":\"Token inválido\",\"status\":401}", response.getContentAsString());
 		assertNull(SecurityContextHolder.getContext().getAuthentication());
-		verify(customUserDetailsService, never()).loadUserById(org.mockito.ArgumentMatchers.anyLong());
+		verify(customUserDetailsService, never()).loadUserByUuidPublic(org.mockito.ArgumentMatchers.any(UUID.class));
 	}
 
 	// ===== doFilterInternal (token válido) =====
@@ -108,20 +111,43 @@ class JwtAuthenticationFilterTest {
 		MockFilterChain filterChain = new MockFilterChain();
 
 		User user = new User();
-		user.setId(1L);
+		UUID uuidPublic = UUID.randomUUID();
+		user.setUuidPublic(uuidPublic);
 		user.setEmail("user@email.com");
 		user.setNickname("user");
 		user.setPassword("password");
 		CustomUserDetails customUserDetails = new CustomUserDetails(user);
 
 		when(jwtService.isTokenValid("valid-token")).thenReturn(true);
-		when(jwtService.extractSubject("valid-token")).thenReturn("1");
-		when(customUserDetailsService.loadUserById(1L)).thenReturn(customUserDetails);
+		when(jwtService.extractSubject("valid-token")).thenReturn(uuidPublic.toString());
+		when(customUserDetailsService.loadUserByUuidPublic(uuidPublic)).thenReturn(customUserDetails);
 
 		jwtAuthenticationFilter.doFilter(request, response, filterChain);
 
 		assertNotNull(SecurityContextHolder.getContext().getAuthentication());
 		assertEquals(customUserDetails, SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-		verify(customUserDetailsService).loadUserById(1L);
+		verify(customUserDetailsService).loadUserByUuidPublic(uuidPublic);
+	}
+
+	// ===== doFilterInternal (usuário não encontrado) =====
+	@Test
+	void doFilterShouldReturnUnauthorizedWhenUserIsNotFound() throws Exception {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.addHeader("Authorization", "Bearer valid-token");
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		MockFilterChain filterChain = new MockFilterChain();
+
+		UUID uuidPublic = UUID.randomUUID();
+		when(jwtService.isTokenValid("valid-token")).thenReturn(true);
+		when(jwtService.extractSubject("valid-token")).thenReturn(uuidPublic.toString());
+		when(customUserDetailsService.loadUserByUuidPublic(uuidPublic))
+				.thenThrow(new UsernameNotFoundException("Usuário não encontrado"));
+
+		jwtAuthenticationFilter.doFilter(request, response, filterChain);
+
+		assertEquals(401, response.getStatus());
+		assertEquals("application/json", response.getContentType());
+		assertEquals("{\"error\":\"Token inválido\",\"status\":401}", response.getContentAsString());
+		assertNull(SecurityContextHolder.getContext().getAuthentication());
 	}
 }

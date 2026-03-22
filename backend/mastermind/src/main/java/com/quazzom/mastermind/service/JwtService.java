@@ -3,6 +3,7 @@ package com.quazzom.mastermind.service;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
@@ -26,12 +27,12 @@ public class JwtService {
         this.expirationSeconds = expirationSeconds;
     }
 
-    public String generateToken(Integer userID) {
+    public String generateToken(UUID uuidPublic) {
         Instant now = Instant.now();
         Instant expiration = now.plusSeconds(expirationSeconds);
 
         return Jwts.builder()
-                .subject(userID.toString())
+                .subject(uuidPublic.toString())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiration))
                 .signWith(secretKey)

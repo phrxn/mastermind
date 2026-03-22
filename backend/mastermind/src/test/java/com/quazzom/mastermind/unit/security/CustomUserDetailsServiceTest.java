@@ -1,6 +1,7 @@
 package com.quazzom.mastermind.unit.security;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -36,6 +37,7 @@ class CustomUserDetailsServiceTest {
 	void setUp() {
 		testUser = new User();
 		testUser.setId(1L);
+		testUser.setUuidPublic(UUID.randomUUID());
 		testUser.setEmail("test@email.com");
 		testUser.setNickname("testuser");
 		testUser.setPassword("password");
@@ -77,24 +79,25 @@ class CustomUserDetailsServiceTest {
 		assertEquals("Usuário não encontrado", exception.getMessage());
 	}
 
-	// ===== loadUserById =====
+	// ===== loadUserByUuidPublic =====
 	@Test
-	void loadUserByIdShouldFindByIdAndReturnUserDetails() {
-		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+	void loadUserByUuidPublicShouldFindByUuidAndReturnUserDetails() {
+		when(userRepository.findByUuidPublic(testUser.getUuidPublic())).thenReturn(Optional.of(testUser));
 
-		UserDetails userDetails = customUserDetailsService.loadUserById(1L);
+		UserDetails userDetails = customUserDetailsService.loadUserByUuidPublic(testUser.getUuidPublic());
 
 		assertEquals("test@email.com", userDetails.getUsername());
 		assertEquals("password", userDetails.getPassword());
 	}
 
-	// ===== loadUserById (not found) =====
+	// ===== loadUserByUuidPublic (not found) =====
 	@Test
-	void loadUserByIdShouldThrowWhenUserNotFound() {
-		when(userRepository.findById(999L)).thenReturn(Optional.empty());
+	void loadUserByUuidPublicShouldThrowWhenUserNotFound() {
+		UUID unknownUuid = UUID.randomUUID();
+		when(userRepository.findByUuidPublic(unknownUuid)).thenReturn(Optional.empty());
 
 		UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
-				() -> customUserDetailsService.loadUserById(999L));
+				() -> customUserDetailsService.loadUserByUuidPublic(unknownUuid));
 
 		assertEquals("Usuário não encontrado", exception.getMessage());
 	}

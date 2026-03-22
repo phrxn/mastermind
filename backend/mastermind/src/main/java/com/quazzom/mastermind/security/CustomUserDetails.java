@@ -2,6 +2,7 @@ package com.quazzom.mastermind.security;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,8 +33,12 @@ public class CustomUserDetails implements UserDetails {
         return user.getEmail();
     }
 
-    public Long getId() {
+	public Long getId() {
         return user.getId();
+    }
+
+    public UUID getUuidPublic() {
+        return user.getUuidPublic();
     }
 
     public String getEmail() {

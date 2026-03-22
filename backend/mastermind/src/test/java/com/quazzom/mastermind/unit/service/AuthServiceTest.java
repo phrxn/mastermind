@@ -1,22 +1,22 @@
 package com.quazzom.mastermind.unit.service;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -102,7 +102,6 @@ class AuthServiceTest {
 		assertEquals(registerRequest.getAge(), capturedUser.getAge());
 		assertEquals("encodedPassword", capturedUser.getPassword());
 
-		assertEquals(savedUser.getId(), response.getId());
 		assertEquals(savedUser.getName(), response.getName());
 		assertEquals(savedUser.getEmail(), response.getEmail());
 		assertEquals(savedUser.getNickname(), response.getNickname());
@@ -139,12 +138,14 @@ class AuthServiceTest {
 	void loginShouldReturnTokenWhenCredentialsAreValid() {
 		User user = new User();
 		user.setId(10L);
+		UUID uuidPublic = UUID.randomUUID();
+		user.setUuidPublic(uuidPublic);
 		user.setEmail("maria@teste.com");
 		user.setPassword("encodedPassword");
 
 		when(userRepository.findByEmail(loginRequest.getUsername())).thenReturn(Optional.of(user));
 		when(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())).thenReturn(true);
-		when(jwtService.generateToken(user.getId().intValue())).thenReturn("jwt-token");
+		when(jwtService.generateToken(uuidPublic)).thenReturn("jwt-token");
 
 		LoginResponse response = authService.login(loginRequest);
 
@@ -156,6 +157,8 @@ class AuthServiceTest {
 	void loginShouldReturnTokenWhenNicknameIsUsedAndCredentialsAreValid() {
 		User user = new User();
 		user.setId(10L);
+		UUID uuidPublic = UUID.randomUUID();
+		user.setUuidPublic(uuidPublic);
 		user.setEmail("maria@teste.com");
 		user.setPassword("encodedPassword");
 
@@ -163,7 +166,7 @@ class AuthServiceTest {
 		when(userRepository.findByEmail(loginRequest.getUsername())).thenReturn(Optional.empty());
 		when(userRepository.findByNickname(loginRequest.getUsername())).thenReturn(Optional.of(user));
 		when(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())).thenReturn(true);
-		when(jwtService.generateToken(user.getId().intValue())).thenReturn("jwt-token");
+		when(jwtService.generateToken(uuidPublic)).thenReturn("jwt-token");
 
 		LoginResponse response = authService.login(loginRequest);
 
@@ -202,17 +205,18 @@ class AuthServiceTest {
 	void meShouldReturnAuthenticatedUserData() {
 		User user = new User();
 		user.setId(10L);
+		UUID uuidPublic = UUID.randomUUID();
+		user.setUuidPublic(uuidPublic);
 		user.setName("Maria Silva");
 		user.setEmail("maria@teste.com");
 		user.setNickname("maria");
 		user.setAge(25);
 
-		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
+		when(userRepository.findByUuidPublic(uuidPublic)).thenReturn(Optional.of(user));
 
-		MeResponse response = authService.me(10L);
+		MeResponse response = authService.me(uuidPublic);
 
 		assertTrue(response.isAuthenticated());
-		assertEquals(10L, response.getId());
 		assertEquals("Maria Silva", response.getName());
 		assertEquals("maria@teste.com", response.getEmail());
 		assertEquals("maria", response.getNickname());
@@ -221,10 +225,11 @@ class AuthServiceTest {
 
 	@Test
 	void meShouldThrowWhenUserFromTokenIsNotFound() {
-		when(userRepository.findById(999L)).thenReturn(Optional.empty());
+		UUID unknownUuid = UUID.randomUUID();
+		when(userRepository.findByUuidPublic(unknownUuid)).thenReturn(Optional.empty());
 
 		UnauthorizedException exception = assertThrows(UnauthorizedException.class,
-				() -> authService.me(999L));
+				() -> authService.me(unknownUuid));
 
 		assertEquals("Usuário não autenticado", exception.getMessage());
 	}

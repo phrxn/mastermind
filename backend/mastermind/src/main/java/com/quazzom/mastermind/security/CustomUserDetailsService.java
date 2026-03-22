@@ -1,5 +1,7 @@
 package com.quazzom.mastermind.security;
 
+import java.util.UUID;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,8 +28,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new CustomUserDetails(user);
     }
 
-	public UserDetails loadUserById(Long userId) throws UsernameNotFoundException {
-		User user = userRepository.findById(userId)
+	public UserDetails loadUserByUuidPublic(UUID uuidPublic) throws UsernameNotFoundException {
+		User user = userRepository.findByUuidPublic(uuidPublic)
 				.orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
 
 		return new CustomUserDetails(user);

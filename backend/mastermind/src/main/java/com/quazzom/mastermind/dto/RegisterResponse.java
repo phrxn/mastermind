@@ -1,17 +1,19 @@
 package com.quazzom.mastermind.dto;
 
+import java.util.UUID;
+
 import com.quazzom.mastermind.entity.User;
 
 public class RegisterResponse {
 
-    private Long id;
+    private UUID uuidPublic;
     private String name;
     private String email;
     private String nickname;
 	private Integer age;
 
     public RegisterResponse(User user) {
-        this.id = user.getId();
+        this.uuidPublic = user.getUuidPublic();
         this.name = user.getName();
         this.email = user.getEmail();
         this.nickname = user.getNickname();
@@ -19,8 +21,8 @@ public class RegisterResponse {
     }
 
     // getters
-    public Long getId() {
-        return id;
+    public UUID getUuidPublic() {
+        return uuidPublic;
     }
 
     public String getName() {

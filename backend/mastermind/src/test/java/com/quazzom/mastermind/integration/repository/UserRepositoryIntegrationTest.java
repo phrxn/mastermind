@@ -103,13 +103,14 @@ public class UserRepositoryIntegrationTest {
 	void shouldApplyDefaultValuesFromUserEntity() {
 		User user = new User();
 		user.setName("Carlos");
+		user.setAge(25);
 		user.setEmail("carlos@email.com");
 		user.setNickname("carlos");
 		user.setPassword("senha");
 
 		User saved = userRepository.save(user);
 
-		assertEquals(0, saved.getAge());
+		assertEquals(25, saved.getAge());
 		assertEquals(0, saved.getLoginAttempts());
 		assertNotNull(saved.getCreatedAt());
 	}
