@@ -1,0 +1,137 @@
+package com.quazzom.mastermind.unit.service;
+
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.quazzom.mastermind.dto.UserPasswordRequest;
+import com.quazzom.mastermind.dto.UserProfileRequest;
+import com.quazzom.mastermind.dto.UserProfileResponse;
+import com.quazzom.mastermind.entity.User;
+import com.quazzom.mastermind.exception.UnauthorizedException;
+import com.quazzom.mastermind.repository.UserRepository;
+import com.quazzom.mastermind.service.UserService;
+import com.quazzom.mastermind.validator.UserPasswordRequestValidator;
+import com.quazzom.mastermind.validator.UserProfileRequestValidator;
+
+@ExtendWith(MockitoExtension.class)
+class UserServiceTest {
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private UserProfileRequestValidator userProfileRequestValidator;
+
+    @Mock
+    private UserPasswordRequestValidator userPasswordRequestValidator;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @InjectMocks
+    private UserService userService;
+
+    private UUID uuidPublic;
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        uuidPublic = UUID.randomUUID();
+        user = new User();
+        user.setId(10L);
+        user.setUuidPublic(uuidPublic);
+        user.setName("Maria Silva");
+        user.setEmail("maria@teste.com");
+        user.setNickname("maria");
+        user.setAge(25);
+        user.setPassword("encoded-password");
+    }
+
+    @Test
+    void getProfileShouldReturnProfileData() {
+        when(userRepository.findByUuidPublic(uuidPublic)).thenReturn(Optional.of(user));
+
+        UserProfileResponse response = userService.getProfile(uuidPublic);
+
+        assertEquals("Maria Silva", response.getName());
+        assertEquals("maria@teste.com", response.getEmail());
+        assertEquals("maria", response.getNickname());
+        assertEquals(25, response.getAge());
+    }
+
+    @Test
+    void updateProfileShouldUpdateAndReturnDataWhenNoConflict() {
+        UserProfileRequest request = new UserProfileRequest();
+        request.setName("Maria Souza");
+        request.setNickname("marias");
+        request.setAge(26);
+
+        when(userRepository.findByUuidPublic(uuidPublic)).thenReturn(Optional.of(user));
+        when(userRepository.findByNickname(request.getNickname())).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        UserProfileResponse response = userService.updateProfile(uuidPublic, request);
+
+        verify(userProfileRequestValidator).validateRequestBody(request);
+        assertEquals("Maria Souza", response.getName());
+        assertEquals("marias", response.getNickname());
+        assertEquals(26, response.getAge());
+    }
+
+
+    @Test
+    void deleteProfileShouldDeleteAuthenticatedUser() {
+        when(userRepository.findByUuidPublic(uuidPublic)).thenReturn(Optional.of(user));
+
+        userService.deleteProfile(uuidPublic);
+
+        verify(userRepository).delete(user);
+    }
+
+    @Test
+    void updatePasswordShouldSaveEncodedPasswordWhenCurrentIsValid() {
+        UserPasswordRequest request = new UserPasswordRequest();
+        request.setCurrentPassword("Abc@123");
+        request.setNewPassword("Def@456");
+
+        when(userRepository.findByUuidPublic(uuidPublic)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("Abc@123", "encoded-password")).thenReturn(true);
+        when(passwordEncoder.encode("Def@456")).thenReturn("new-encoded-password");
+
+        userService.updatePassword(uuidPublic, request);
+
+        verify(userPasswordRequestValidator).validateRequestBody(request);
+        verify(userRepository).save(user);
+        assertEquals("new-encoded-password", user.getPassword());
+    }
+
+    @Test
+    void updatePasswordShouldThrowWhenCurrentPasswordIsInvalid() {
+        UserPasswordRequest request = new UserPasswordRequest();
+        request.setCurrentPassword("wrong");
+        request.setNewPassword("Def@456");
+
+        when(userRepository.findByUuidPublic(uuidPublic)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("wrong", "encoded-password")).thenReturn(false);
+
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class,
+                () -> userService.updatePassword(uuidPublic, request));
+
+        assertEquals("Senha atual inválida", exception.getMessage());
+        verify(userRepository, never()).save(any(User.class));
+    }
+}

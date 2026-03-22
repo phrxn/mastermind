@@ -463,6 +463,35 @@ class UserBusinessRuleTest {
 		assertEquals("Abc123-", userBusinessRule.getPassword());
 	}
 
+	@Test
+	void setPasswordShouldPassWhenPasswordIsNewAndValid() {
+		assertDoesNotThrow(() -> userBusinessRule.setPassword("Def456@", true));
+		assertEquals("Def456@", userBusinessRule.getPassword());
+	}
+
+	@Test
+	void setPasswordShouldFailWhenNewPasswordIsNull() {
+		RequestPropertyNotFoundException exception = assertThrows(RequestPropertyNotFoundException.class,
+				() -> userBusinessRule.setPassword(null, true));
+		assertEquals("A propriedade 'password' deve existir.", exception.getMessage());
+	}
+
+	@Test
+	void setPasswordShouldFailWhenNewPasswordLengthIsTooShort() {
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userBusinessRule.setPassword("Ab1!", true));
+		assertEquals("A nova senha deve ter entre 6 e 20 caracteres", exception.getMessage());
+	}
+
+	@Test
+	void setPasswordShouldFailWhenNewPasswordLacksAllowedComposition() {
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userBusinessRule.setPassword("abcdef1", true));
+		assertEquals(
+				"A nova senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -",
+				exception.getMessage());
+	}
+
 	// ===== Other Fields =====
 	@Test
 	void setIdShouldWork() {

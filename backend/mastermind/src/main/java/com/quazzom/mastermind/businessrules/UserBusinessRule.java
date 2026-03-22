@@ -112,21 +112,34 @@ public class UserBusinessRule extends User {
 
 	@Override
 	public void setPassword(String password) {
+		checkPassword(password, false);
+		super.setPassword(password);
+	}
+
+	public void setPassword(String password, boolean isNew){
+		checkPassword(password, isNew);
+		super.setPassword(password);
+	}
+
+	private void checkPassword(String password, boolean isNew){
+		String prefix = isNew ? "nova " : "";
+
 		if (password == null) {
 			throw new RequestPropertyNotFoundException(
 					messageDefaultForPropertiesJSON.createMessageForPropertyThatDoesNotExist("password"));
 		}
 
 		if (password.length() < 6 || password.length() > 20) {
-			throw new RequestInvalidPropertyValueException("A senha deve ter entre 6 e 20 caracteres");
+			throw new RequestInvalidPropertyValueException(
+					String.format("A %ssenha deve ter entre 6 e 20 caracteres", prefix));
 		}
 
 		if (!password.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%¨_\\-]).*$")) {
-			throw new RequestInvalidPropertyValueException(
-					"A senha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ % ¨ _ -");
+			throw new RequestInvalidPropertyValueException(String.format(
+				"A %ssenha deve conter letra maiúscula, letra minúscula, número e ao menos um símbolo entre: ! @ # $ %% ¨ _ -", prefix));
 		}
-		super.setPassword(password);
 	}
+
 
 	public void setMessageDefaultForPropertiesJSON(MessageDefaultForPropertiesJSON messageDefaultForPropertiesJSON) {
 		this.messageDefaultForPropertiesJSON = messageDefaultForPropertiesJSON;

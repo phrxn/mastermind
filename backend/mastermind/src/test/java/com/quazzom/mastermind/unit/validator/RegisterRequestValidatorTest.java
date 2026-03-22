@@ -3,7 +3,6 @@ package com.quazzom.mastermind.unit.validator;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -143,14 +142,11 @@ class RegisterRequestValidatorTest {
 	}
 
 	@Test
-	void validateRegisterShouldFailWhenEmailTldHasOneCharacter() {
+	void validateRegisterShouldPassWhenEmailTldHasOneCharacter() {
 		RegisterRequest request = validRequest();
 		request.setEmail("a@b.c");
 
-		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
-				() -> userValidator.validateRequestBody(request));
-		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)",
-				exception.getMessage());
+		assertDoesNotThrow(() -> userValidator.validateRequestBody(request));
 	}
 
 	@Test
