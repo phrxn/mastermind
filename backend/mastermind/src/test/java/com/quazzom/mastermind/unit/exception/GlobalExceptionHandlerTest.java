@@ -52,7 +52,8 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void handleHttpMessageNotReadableShouldReturnBadRequest() {
-        HttpMessageNotReadableException exception = new HttpMessageNotReadableException("Corpo vazio", null);
+
+        HttpMessageNotReadableException exception = new HttpMessageNotReadableException("Corpo vazio", (Throwable)null, null);
 
         ResponseEntity<?> response = handler.handleHttpMessageNotReadable(exception);
 
