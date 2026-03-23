@@ -22,8 +22,13 @@ import com.quazzom.mastermind.exception.UnauthorizedException;
 import com.quazzom.mastermind.security.CustomUserDetails;
 import com.quazzom.mastermind.service.UserService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/users")
+@Tag(name = "Você", description = "Endpoints para você gerenciar o seu perfil, ver o seu histórico de jogos e records")
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
     private final UserService userService;

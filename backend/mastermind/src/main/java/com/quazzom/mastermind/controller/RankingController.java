@@ -11,7 +11,12 @@ import com.quazzom.mastermind.dto.GameFullResponse;
 import com.quazzom.mastermind.dto.RankingGlobalResponse;
 import com.quazzom.mastermind.service.RankingService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
+@Tag(name = "Ranking Global", description = "Endpoints para ver o ranking global e detalhes de jogos específicos que estão no top 10 de cada level do ranking")
+@SecurityRequirement(name = "bearerAuth")
 public class RankingController {
 
     private final RankingService rankingService;

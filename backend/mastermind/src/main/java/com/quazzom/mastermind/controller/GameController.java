@@ -20,8 +20,13 @@ import com.quazzom.mastermind.exception.UnauthorizedException;
 import com.quazzom.mastermind.security.CustomUserDetails;
 import com.quazzom.mastermind.service.GameService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/game")
+@Tag(name = "Jogo", description = "Endpoints para jogar")
+@SecurityRequirement(name = "bearerAuth")
 public class GameController {
 
     private final GameService gameService;
