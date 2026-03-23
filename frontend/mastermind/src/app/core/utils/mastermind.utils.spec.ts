@@ -3,6 +3,7 @@ import {
   nextGuessSelection,
   normalizeBoardState,
   normalizeHistoryResponse,
+  normalizeRankingResponse,
   normalizeStatus,
   removeGuessSelection
 } from './mastermind.utils';
@@ -50,5 +51,18 @@ describe('mastermind utils', () => {
 
     expect(result.gameHistoryBestGames[0].level).toBe('EASY');
     expect(result.gameHistoryBestGames[0].status).toBe(normalizeStatus(2));
+  });
+
+  it('should normalize ranking payloads with list suffix keys', () => {
+    const result = normalizeRankingResponse({
+      top10EasyGamesList: [{ gameUuidPublic: 'game-1', userNickname: 'Ace', gameLevel: 1, pointsMaked: 30, attemptsUsed: 2 }],
+      top10NormalGamesList: [],
+      top10HardGamesList: [],
+      top10MastermindGamesList: []
+    });
+
+    expect(result.top10EasyGames).toHaveSize(1);
+    expect(result.top10EasyGames[0].gameLevel).toBe('EASY');
+    expect(result.top10EasyGames[0].userNickname).toBe('Ace');
   });
 });

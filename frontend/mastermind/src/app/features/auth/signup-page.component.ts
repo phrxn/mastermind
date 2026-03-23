@@ -20,7 +20,7 @@ import { formatApiError } from '../../core/utils/mastermind.utils';
         </p>
       </div>
 
-      <form class="card-surface auth-card" [formGroup]="form" (ngSubmit)="submit()">
+      <form class="card-surface auth-card" [formGroup]="form" (ngSubmit)="openConfirmDialog()">
         <div class="section-heading">
           <div>
             <p class="eyebrow">Cadastro</p>
@@ -70,6 +70,23 @@ import { formatApiError } from '../../core/utils/mastermind.utils';
           <a routerLink="/auth/login" class="text-link">Voltar ao login</a>
         </div>
       </form>
+
+      @if (confirmDialogOpen()) {
+        <div class="dialog-backdrop" (click)="closeConfirmDialog()">
+          <section class="dialog-panel card-surface" role="dialog" aria-modal="true" aria-label="Confirmar cadastro" (click)="$event.stopPropagation()">
+            <div class="dialog-copy">
+              <p class="eyebrow">Confirmacao</p>
+              <h3>Confirmar cadastro</h3>
+              <p class="dialog-message">Revise os dados antes de enviar. Deseja criar este usuario agora?</p>
+            </div>
+
+            <div class="dialog-actions">
+              <button type="button" class="secondary-button" (click)="closeConfirmDialog()">Voltar</button>
+              <button type="button" class="primary-button" (click)="submitConfirmed()">Confirmar envio</button>
+            </div>
+          </section>
+        </div>
+      }
     </section>
   `
 })
@@ -80,6 +97,7 @@ export class SignupPageComponent {
   readonly loading = signal(false);
   readonly error = signal('');
   readonly success = signal('');
+  readonly confirmDialogOpen = signal(false);
   readonly form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
@@ -88,11 +106,21 @@ export class SignupPageComponent {
     password: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(6)] })
   });
 
-  submit(): void {
+  openConfirmDialog(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
+
+    this.confirmDialogOpen.set(true);
+  }
+
+  closeConfirmDialog(): void {
+    this.confirmDialogOpen.set(false);
+  }
+
+  submitConfirmed(): void {
+    this.confirmDialogOpen.set(false);
 
     this.error.set('');
     this.success.set('');

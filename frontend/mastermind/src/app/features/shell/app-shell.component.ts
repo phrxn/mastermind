@@ -47,6 +47,7 @@ export class AppShellComponent {
   readonly menuOpen = signal(false);
   readonly navItems = [
     { path: '/app/play', label: 'Jogar' },
+    { path: '/app/rules', label: 'Rules' },
     { path: '/app/history', label: 'Historico' },
     { path: '/app/ranking', label: 'Ranking' },
     { path: '/app/profile', label: 'Perfil' }

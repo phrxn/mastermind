@@ -10,6 +10,7 @@ import { PlayPageComponent } from './features/play/play-page.component';
 import { ProfilePageComponent } from './features/profile/profile-page.component';
 import { RankingDetailPageComponent } from './features/ranking/ranking-detail-page.component';
 import { RankingPageComponent } from './features/ranking/ranking-page.component';
+import { RulesPageComponent } from './features/rules/rules-page.component';
 
 export const routes: Routes = [
 	{
@@ -27,6 +28,7 @@ export const routes: Routes = [
 		canActivate: [authGuard],
 		children: [
 			{ path: 'play', component: PlayPageComponent },
+			{ path: 'rules', component: RulesPageComponent },
 			{ path: 'history', component: HistoryPageComponent },
 			{ path: 'history/:uuid', component: HistoryDetailPageComponent },
 			{ path: 'ranking', component: RankingPageComponent },

@@ -37,11 +37,23 @@ type RankingTab = 'easy' | 'normal' | 'hard' | 'mastermind';
         @if (currentItems().length === 0) {
           <section class="card-surface empty-state">Ainda nao existem partidas ranqueadas nessa faixa.</section>
         } @else {
-          <div class="cards-grid ranking-grid">
-            @for (item of currentItems(); track item.gameUuidPublic) {
-              <button type="button" class="ranking-card card-surface" (click)="openDetail(item.gameUuidPublic)">
+          <div class="ranking-list" aria-label="Ranking atual">
+            @for (item of currentItems(); track item.gameUuidPublic; let index = $index) {
+              <button
+                type="button"
+                class="ranking-card card-surface"
+                [class.top-rank]="index < 3"
+                [class.top-rank-1]="index === 0"
+                [class.top-rank-2]="index === 1"
+                [class.top-rank-3]="index === 2"
+                (click)="openDetail(item.gameUuidPublic)"
+              >
+                <div class="ranking-position" aria-hidden="true">#{{ index + 1 }}</div>
                 <div class="history-card-top">
-                  <strong>{{ item.userNickname }}</strong>
+                  <div>
+                    <strong>{{ item.userNickname }}</strong>
+                    <p class="ranking-subtitle">{{ index === 0 ? 'Melhor partida da fila atual' : 'Replay disponivel para consulta' }}</p>
+                  </div>
                   <span class="status-pill">{{ levelLabels[item.gameLevel] }}</span>
                 </div>
                 <dl class="card-data-grid">
@@ -100,13 +112,13 @@ export class RankingPageComponent {
 
     switch (tab) {
       case 'easy':
-        return ranking.top10EasyGamesList;
+        return ranking.top10EasyGames;
       case 'normal':
-        return ranking.top10NormalGamesList;
+        return ranking.top10NormalGames;
       case 'hard':
-        return ranking.top10HardGamesList;
+        return ranking.top10HardGames;
       case 'mastermind':
-        return ranking.top10MastermindGamesList;
+        return ranking.top10MastermindGames;
     }
   }
 }

@@ -2,6 +2,7 @@
 
 :root {
 	color-scheme: light;
+	--site-max-width: 900px;
 	--bg: #f4efe3;
 	--bg-soft: rgba(255, 250, 240, 0.8);
 	--surface: rgba(255, 248, 235, 0.84);
@@ -95,6 +96,12 @@ p {
 	align-items: center;
 	gap: 1.5rem;
 	padding: 1.5rem;
+}
+
+.auth-layout,
+.app-shell {
+	width: 100%;
+	margin-inline: auto;
 }
 
 .auth-layout-signup {
@@ -225,11 +232,11 @@ p {
 .logout-button,
 .menu-toggle,
 .tab-button {
-	border: 0;
+	border: 2px solid rgba(31, 41, 55, 0.12);
 	border-radius: 999px;
 	min-height: 3rem;
 	padding: 0.75rem 1.2rem;
-	transition: transform 180ms ease, opacity 180ms ease, background 180ms ease;
+	transition: transform 180ms ease, opacity 180ms ease, 180ms ease;
 }
 
 .primary-button {
@@ -258,6 +265,7 @@ p {
 	background: transparent;
 	color: var(--text);
 	font-weight: 700;
+	background-color: var(--accent-dark)
 }
 
 .text-link {
@@ -398,11 +406,73 @@ p {
 	grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
 }
 
+.ranking-list {
+	display: grid;
+	gap: 0.85rem;
+}
+
 .level-card,
 .history-card,
 .ranking-card {
 	border: 0;
 	text-align: left;
+}
+
+.ranking-card {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	gap: 1rem;
+	align-items: start;
+	width: 100%;
+	padding: 1rem 1.1rem;
+	position: relative;
+	overflow: hidden;
+}
+
+.ranking-card::after {
+	content: '';
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: 0.35rem;
+	background: transparent;
+	transition: background 180ms ease;
+}
+
+.top-rank::after {
+	background: linear-gradient(180deg, rgba(255, 123, 0, 0.95), rgba(228, 93, 4, 0.4));
+}
+
+.top-rank-1 {
+	background: linear-gradient(135deg, rgba(255, 215, 64, 0.28), rgba(255, 248, 235, 0.92));
+	border-color: rgba(255, 123, 0, 0.22);
+	transform: scale(1.01);
+}
+
+.top-rank-2 {
+	background: linear-gradient(135deg, rgba(203, 213, 225, 0.28), rgba(255, 248, 235, 0.92));
+}
+
+.top-rank-3 {
+	background: linear-gradient(135deg, rgba(251, 146, 60, 0.18), rgba(255, 248, 235, 0.92));
+}
+
+.ranking-position {
+	min-width: 3.35rem;
+	height: 3.35rem;
+	display: grid;
+	place-items: center;
+	border-radius: 1rem;
+	background: rgba(15, 23, 42, 0.06);
+	font-family: 'Oxanium', sans-serif;
+	font-size: 1.15rem;
+	font-weight: 800;
+	color: var(--accent-dark);
+}
+
+.ranking-subtitle {
+	margin-top: 0.3rem;
+	color: var(--muted);
+	font-size: 0.88rem;
 }
 
 .level-card {
@@ -636,7 +706,49 @@ p {
 	color: var(--accent-dark);
 }
 
+.dialog-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 60;
+	display: grid;
+	place-items: center;
+	padding: 1.25rem;
+	background: rgba(15, 23, 42, 0.42);
+	backdrop-filter: blur(8px);
+}
+
+.dialog-panel {
+	width: min(100%, 28rem);
+	display: grid;
+	gap: 1.25rem;
+	padding: 1.4rem;
+	background: var(--surface-strong);
+	box-shadow: 0 32px 80px rgba(15, 23, 42, 0.24);
+}
+
+.dialog-copy {
+	display: grid;
+	gap: 0.7rem;
+}
+
+.dialog-message {
+	color: var(--muted);
+	line-height: 1.5;
+}
+
+.dialog-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+}
+
 @media (min-width: 900px) {
+	.auth-layout,
+	.app-shell {
+		max-width: var(--site-max-width);
+	}
+
 	.auth-layout {
 		grid-template-columns: minmax(0, 1.1fr) minmax(22rem, 28rem);
 		padding: 2rem 2.5rem;

@@ -173,22 +173,17 @@ export function normalizeRankingItem(value: unknown): RankingItem {
   };
 }
 
+function normalizeRankingList(value: unknown): RankingItem[] {
+  return Array.isArray(value) ? value.map((item: unknown) => normalizeRankingItem(item)) : [];
+}
+
 export function normalizeRankingResponse(value: unknown): RankingResponse {
-  console.log(value);
   const source = (value as Record<string, unknown>) ?? {};
   return {
-    top10EasyGames: Array.isArray(source['top10EasyGames'])
-      ? source['top10EasyGames'].map((item) => normalizeRankingItem(item))
-      : [],
-    top10NormalGames: Array.isArray(source['top10NormalGames'])
-      ? source['top10NormalGames'].map((item) => normalizeRankingItem(item))
-      : [],
-    top10HardGames: Array.isArray(source['top10HardGames'])
-      ? source['top10HardGames'].map((item) => normalizeRankingItem(item))
-      : [],
-    top10MastermindGames: Array.isArray(source['top10MastermindGames'])
-      ? source['top10MastermindGames'].map((item) => normalizeRankingItem(item))
-      : []
+    top10EasyGames: normalizeRankingList(source['top10EasyGames'] ?? source['top10EasyGamesList']),
+    top10NormalGames: normalizeRankingList(source['top10NormalGames'] ?? source['top10NormalGamesList']),
+    top10HardGames: normalizeRankingList(source['top10HardGames'] ?? source['top10HardGamesList']),
+    top10MastermindGames: normalizeRankingList(source['top10MastermindGames'] ?? source['top10MastermindGamesList'])
   };
 }
 

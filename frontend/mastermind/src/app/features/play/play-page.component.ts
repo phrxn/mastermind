@@ -97,10 +97,10 @@ import { MastermindBoardComponent } from '../../shared/components/mastermind-boa
               </div>
 
               <div class="action-row">
-                <button type="button" class="primary-button" [disabled]="!canSubmitGuess() || loadingAction()" (click)="submitGuess()">
+                <button type="button" class="primary-button" [disabled]="!canSubmitGuess() || loadingAction()" (click)="openConfirmDialog('submit')">
                   {{ loadingAction() ? 'Enviando...' : 'Tentar' }}
                 </button>
-                <button type="button" class="danger-button" [disabled]="loadingAction()" (click)="giveUp()">
+                <button type="button" class="danger-button" [disabled]="loadingAction()" (click)="openConfirmDialog('give-up')">
                   Desistir
                 </button>
               </div>
@@ -108,6 +108,23 @@ import { MastermindBoardComponent } from '../../shared/components/mastermind-boa
               <div class="feedback success">Partida encerrada. O segredo foi revelado no topo do tabuleiro.</div>
               <button type="button" class="secondary-button full-width" (click)="backToMenu()">Voltar ao menu</button>
             }
+          </section>
+        </div>
+      }
+
+      @if (confirmDialogOpen()) {
+        <div class="dialog-backdrop" (click)="closeConfirmDialog()">
+          <section class="dialog-panel card-surface" role="dialog" aria-modal="true" [attr.aria-label]="confirmDialogTitle()" (click)="$event.stopPropagation()">
+            <div class="dialog-copy">
+              <p class="eyebrow">Confirmacao</p>
+              <h3>{{ confirmDialogTitle() }}</h3>
+              <p class="dialog-message">{{ confirmDialogMessage() }}</p>
+            </div>
+
+            <div class="dialog-actions">
+              <button type="button" class="secondary-button" (click)="closeConfirmDialog()">Voltar</button>
+              <button type="button" class="primary-button" (click)="confirmDialogAction()">Confirmar</button>
+            </div>
           </section>
         </div>
       }
@@ -122,6 +139,9 @@ export class PlayPageComponent {
   readonly loading = signal(true);
   readonly loadingAction = signal(false);
   readonly error = signal('');
+  readonly confirmDialogOpen = signal(false);
+  readonly confirmDialogTitle = signal('');
+  readonly confirmDialogMessage = signal('');
   readonly levelOptions = levelOptions;
   readonly colorTokens = colorTokens;
   readonly levelLabels = levelLabels;
@@ -129,6 +149,7 @@ export class PlayPageComponent {
   readonly canSubmitGuess = computed(
     () => this.activeGuess().length === (this.board()?.numberOfColumnColors ?? Number.POSITIVE_INFINITY)
   );
+  private pendingConfirmAction: 'submit' | 'give-up' | null = null;
 
   constructor() {
     this.loadCurrentGame();
@@ -199,11 +220,52 @@ export class PlayPageComponent {
     return false;
   }
 
+  openConfirmDialog(action: 'submit' | 'give-up'): void {
+    const currentBoard = this.board();
+
+    if (!currentBoard) {
+      return;
+    }
+
+    if (action === 'submit' && !this.canSubmitGuess()) {
+      return;
+    }
+
+    this.pendingConfirmAction = action;
+    this.confirmDialogTitle.set(action === 'submit' ? 'Confirmar tentativa' : 'Confirmar desistencia');
+    this.confirmDialogMessage.set(
+      action === 'submit'
+        ? 'Deseja enviar essa tentativa agora?'
+        : 'Deseja realmente desistir da partida atual?'
+    );
+    this.confirmDialogOpen.set(true);
+  }
+
+  closeConfirmDialog(): void {
+    this.confirmDialogOpen.set(false);
+    this.pendingConfirmAction = null;
+  }
+
+  confirmDialogAction(): void {
+    const action = this.pendingConfirmAction;
+    this.confirmDialogOpen.set(false);
+    this.pendingConfirmAction = null;
+
+    if (action === 'submit') {
+      this.submitGuess();
+      return;
+    }
+
+    if (action === 'give-up') {
+      this.giveUp();
+    }
+  }
+
   submitGuess(): void {
     const currentBoard = this.board();
     const guess = this.activeGuess();
 
-    if (!currentBoard || !this.canSubmitGuess() || !window.confirm('Deseja enviar essa tentativa?')) {
+    if (!currentBoard || !this.canSubmitGuess()) {
       return;
     }
 
@@ -233,7 +295,7 @@ export class PlayPageComponent {
   }
 
   giveUp(): void {
-    if (!window.confirm('Deseja realmente desistir da partida?')) {
+    if (!this.board()) {
       return;
     }
 
