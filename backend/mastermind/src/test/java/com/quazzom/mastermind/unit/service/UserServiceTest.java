@@ -184,8 +184,8 @@ class UserServiceTest {
 
         GameHistoryResponse response = userService.getHistory(uuidPublic);
 
-        assertEquals(1, response.getGameHistoryBestGames().size());
-        assertEquals(2, response.getGameHistoryFull().size());
+        assertEquals(1, response.gameHistoryBestGames().size());
+        assertEquals(2, response.gameHistoryFull().size());
     }
 
     @Test
@@ -205,8 +205,8 @@ class UserServiceTest {
 
         GameHistoryResponse response = userService.getHistory(uuidPublic);
 
-        assertEquals(1, response.getGameHistoryFull().size());
-        assertEquals(100, response.getGameHistoryFull().get(0).getPointsMaked());
+        assertEquals(1, response.gameHistoryFull().size());
+        assertEquals(100, response.gameHistoryFull().get(0).pointsMaked());
     }
 
     @Test
@@ -225,7 +225,7 @@ class UserServiceTest {
 
         GameHistoryResponse response = userService.getHistory(uuidPublic);
 
-        assertEquals(0, response.getGameHistoryFull().get(0).getPointsMaked());
+        assertEquals(0, response.gameHistoryFull().get(0).pointsMaked());
     }
 
     @Test
@@ -236,8 +236,8 @@ class UserServiceTest {
 
         GameHistoryResponse response = userService.getHistory(uuidPublic);
 
-        assertTrue(response.getGameHistoryBestGames().isEmpty());
-        assertTrue(response.getGameHistoryFull().isEmpty());
+        assertTrue(response.gameHistoryBestGames().isEmpty());
+        assertTrue(response.gameHistoryFull().isEmpty());
     }
 
     @Test
@@ -276,14 +276,14 @@ class UserServiceTest {
 
         GameFullResponse response = userService.getUserGameThatIsNotInProgress(uuidPublic, gameUuidPublic);
 
-        assertEquals(GameStatus.IN_PROGRESS, response.getStatus());
-        assertEquals(GameLevel.HARD, response.getGameLevel());
-        assertEquals(6, response.getNumberOfColumnColors());
-        assertEquals(10, response.getMaximumOfattempts());
-        assertEquals(1, response.getRows().size());
-        assertEquals(List.of(1, 2, 3, 4, 5, 6), response.getRows().get(0).getGuess());
-        assertEquals(2, response.getRows().get(0).getTips().getCorrectPositions());
-        assertEquals(1, response.getRows().get(0).getTips().getCorrectColors());
+        assertEquals(GameStatus.IN_PROGRESS, response.status());
+        assertEquals(GameLevel.HARD, response.gameLevel());
+        assertEquals(6, response.numberOfColumnColors());
+        assertEquals(10, response.maximumOfattempts());
+        assertEquals(1, response.rows().size());
+        assertEquals(List.of(1, 2, 3, 4, 5, 6), response.rows().get(0).guess());
+        assertEquals(2, response.rows().get(0).tips().getCorrectPositions());
+        assertEquals(1, response.rows().get(0).tips().getCorrectColors());
     }
 
     @Test

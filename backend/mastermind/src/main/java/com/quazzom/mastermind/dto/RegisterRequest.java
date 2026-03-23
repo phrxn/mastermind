@@ -2,6 +2,17 @@ package com.quazzom.mastermind.dto;
 
 public class RegisterRequest {
 
+	public RegisterRequest() {
+		this("", "", "", 0, "");
+	}
+	public RegisterRequest(String name, String email, String nickname, Integer age, String password) {
+		this.name = name;
+		this.email = email;
+		this.nickname = nickname;
+		this.age = age;
+		this.password = password;
+	}
+
     private String name;
     private String email;
     private String nickname;

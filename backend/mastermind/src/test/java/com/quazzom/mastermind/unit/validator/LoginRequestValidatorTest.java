@@ -3,7 +3,6 @@ package com.quazzom.mastermind.unit.validator;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +22,7 @@ public class LoginRequestValidatorTest {
 
 	@Test
 	void validateRequestBodyShouldPassWithValidData() {
-		LoginRequest request = validRequest();
+		LoginRequest request = validRequest("maria@teste.com", "Abc123!");
 
 		assertDoesNotThrow(() -> loginRequestValidator.validateRequestBody(request));
 	}
@@ -31,8 +30,7 @@ public class LoginRequestValidatorTest {
 	// ===== validateRequestBody() =====
 	@Test
 	void validateRequestBodyShouldThrowWhenUsernameIsNull() {
-		LoginRequest request = validRequest();
-		request.setUsername(null);
+		LoginRequest request = validRequest(null, "Abc123!");
 
 		RequestPropertyNotFoundException exception = assertThrows(RequestPropertyNotFoundException.class,
 				() -> loginRequestValidator.validateRequestBody(request));
@@ -42,8 +40,7 @@ public class LoginRequestValidatorTest {
 
 	@Test
 	void validateRequestBodyShouldThrowWhenPasswordIsNull() {
-		LoginRequest request = validRequest();
-		request.setPassword(null);
+		LoginRequest request = validRequest("maria@teste.com", null);
 
 		RequestPropertyNotFoundException exception = assertThrows(RequestPropertyNotFoundException.class,
 				() -> loginRequestValidator.validateRequestBody(request));
@@ -95,10 +92,8 @@ public class LoginRequestValidatorTest {
 		assertDoesNotThrow(() -> loginRequestValidator.isPasswordValid("Abc123!"));
 	}
 
-	private LoginRequest validRequest() {
-		LoginRequest request = new LoginRequest();
-		request.setUsername("maria@teste.com");
-		request.setPassword("Abc123!");
+	private LoginRequest validRequest(String username, String password) {
+		LoginRequest request = new LoginRequest(username, password);
 		return request;
 	}
 

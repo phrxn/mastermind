@@ -69,18 +69,18 @@ public class AuthService {
 
 		loginRequestValidator.validateRequestBody(request);
 
-		String identifier = request.getUsername();
+		String identifier = request.username();
 		User user = userRepository.findByEmail(identifier)
 				.or(() -> userRepository.findByNickname(identifier))
 				.orElseThrow(() -> new UnauthorizedUserOrPasswordInvalidException());
 
-		boolean passwordMatch = passwordEncoder.matches(request.getPassword(), user.getPassword());
+		boolean passwordMatch = passwordEncoder.matches(request.password(), user.getPassword());
 		if (!passwordMatch) {
 			throw new UnauthorizedUserOrPasswordInvalidException();
 		}
 
 		String token = jwtService.generateToken(user.getUuidPublic());
-		return new LoginResponse(token);
+		return new LoginResponse(token, "Bearer");
 	}
 
 	public MeResponse me(UUID uuidPublic) {

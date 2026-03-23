@@ -51,7 +51,7 @@ public class GameController {
             Authentication authentication) {
 
         Long userId = extractUserId(authentication);
-        GameResponse response = gameService.makeGuess(userId, request.getGuess());
+        GameResponse response = gameService.makeGuess(userId, request.guess());
         return ResponseEntity.ok(response);
     }
 

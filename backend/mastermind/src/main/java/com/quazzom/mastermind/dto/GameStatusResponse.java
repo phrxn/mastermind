@@ -5,45 +5,12 @@ import java.util.List;
 import com.quazzom.mastermind.entity.GameLevel;
 import com.quazzom.mastermind.entity.GameStatus;
 
-public class GameStatusResponse {
-
-    private final GameStatus status;
-    private final GameLevel gameLevel;
-    private final Integer numberOfColumnColors;
-    private final Integer maximumOfattempts;
-    private final boolean isRepeatedColorAllowed;
-    private final List<GameStatusRowResponse> row;
-
-    public GameStatusResponse(GameStatus status, GameLevel gameLevel, Integer numberOfColumnColors, Integer maximumOfattempts, boolean isRepeatedColorAllowed, List<GameStatusRowResponse> row) {
-        this.status = status;
-        this.gameLevel = gameLevel;
-        this.numberOfColumnColors = numberOfColumnColors;
-        this.maximumOfattempts = maximumOfattempts;
-        this.isRepeatedColorAllowed = isRepeatedColorAllowed;
-        this.row = row;
-    }
-
-    public GameStatus getStatus() {
-        return status;
-    }
-
-    public GameLevel getGameLevel() {
-        return gameLevel;
-    }
-
-    public Integer getNumberOfColumnColors() {
-        return numberOfColumnColors;
-    }
-
-    public Integer getMaximumOfattempts() {
-        return maximumOfattempts;
-    }
-
-    public boolean isRepeatedColorAllowed() {
-        return isRepeatedColorAllowed;
-    }
-
-    public List<GameStatusRowResponse> getRows() {
-        return row;
-    }
+public record GameStatusResponse(
+        GameStatus status,
+        GameLevel gameLevel,
+        Integer numberOfColumnColors,
+        Integer maximumOfattempts,
+        boolean repeatedColorAllowed,
+        List<GameStatusRowResponse> rows
+) {
 }

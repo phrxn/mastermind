@@ -1,26 +1,25 @@
 package com.quazzom.mastermind.unit.controller;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -48,7 +47,7 @@ class AuthControllerTest {
 
     @Test
     void registerShouldReturnServiceResponse() {
-        RegisterRequest request = new RegisterRequest();
+        RegisterRequest request = new RegisterRequest("", "", "", 0, "");
         User user = new User();
         user.setId(10L);
         RegisterResponse expected = new RegisterResponse(user);
@@ -80,10 +79,8 @@ class AuthControllerTest {
 
     @Test
     void loginShouldReturnServiceResponse() {
-        LoginRequest request = new LoginRequest();
-        request.setUsername("maria@teste.com");
-        request.setPassword("Abc123!");
-        LoginResponse expected = new LoginResponse("jwt-token");
+        LoginRequest request = new LoginRequest("maria@teste.com", "Abc123!");
+        LoginResponse expected = new LoginResponse("jwt-token", "Bearer");
 
         when(userService.login(request)).thenReturn(expected);
 
@@ -112,7 +109,7 @@ class AuthControllerTest {
         ResponseEntity<MeResponse> actual = authController.me(authentication);
 
         assertEquals(HttpStatus.OK, actual.getStatusCode());
-        assertTrue(actual.getBody().isAuthenticated());
+        assertTrue(actual.getBody().authenticated());
         assertSame(expected, actual.getBody());
 		verify(userService).me(uuidPublic);
     }

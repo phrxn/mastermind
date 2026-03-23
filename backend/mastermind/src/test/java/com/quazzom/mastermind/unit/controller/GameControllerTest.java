@@ -78,8 +78,7 @@ class GameControllerTest {
 	// ===== makeGuess =====
 	@Test
 	void makeGuessShouldReturnOkWhenGuessIsValid() {
-		GameGuessRequest request = new GameGuessRequest();
-		request.setGuess(List.of(1, 2, 3, 4));
+		GameGuessRequest request = new GameGuessRequest(List.of(1, 2, 3, 4));
 		GameEndResponse expected = new GameEndResponse(GameStatus.IN_PROGRESS, GameLevel.EASY, List.of(1, 2, 3, 4));
 
 		when(authentication.getName()).thenReturn("15");

@@ -22,8 +22,8 @@ public class LoginRequestValidator implements RequestValidator<LoginRequest> {
 
 	@Override
 	public void validateRequestBody(LoginRequest request) {
-		isUsernameValid(request.getUsername());
-		isPasswordValid(request.getPassword());
+		isUsernameValid(request.username());
+		isPasswordValid(request.password());
 	}
 
 	public void isUsernameValid(String username) {

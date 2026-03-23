@@ -70,9 +70,7 @@ class AuthServiceTest {
 		registerRequest.setAge(25);
 		registerRequest.setPassword("Abc123!");
 
-		loginRequest = new LoginRequest();
-		loginRequest.setUsername("maria@teste.com");
-		loginRequest.setPassword("Abc123!");
+		loginRequest = new LoginRequest("maria@teste.com", "Abc123!");
 	}
 
 	// ===== register() =====
@@ -143,14 +141,14 @@ class AuthServiceTest {
 		user.setEmail("maria@teste.com");
 		user.setPassword("encodedPassword");
 
-		when(userRepository.findByEmail(loginRequest.getUsername())).thenReturn(Optional.of(user));
-		when(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())).thenReturn(true);
+		when(userRepository.findByEmail(loginRequest.username())).thenReturn(Optional.of(user));
+		when(passwordEncoder.matches(loginRequest.password(), user.getPassword())).thenReturn(true);
 		when(jwtService.generateToken(uuidPublic)).thenReturn("jwt-token");
 
 		LoginResponse response = authService.login(loginRequest);
 
-		assertEquals("jwt-token", response.getToken());
-		assertEquals("Bearer", response.getTokenType());
+		assertEquals("jwt-token", response.token());
+		assertEquals("Bearer", response.tokenType());
 	}
 
 	@Test
@@ -162,22 +160,21 @@ class AuthServiceTest {
 		user.setEmail("maria@teste.com");
 		user.setPassword("encodedPassword");
 
-		loginRequest.setUsername("maria");
-		when(userRepository.findByEmail(loginRequest.getUsername())).thenReturn(Optional.empty());
-		when(userRepository.findByNickname(loginRequest.getUsername())).thenReturn(Optional.of(user));
-		when(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())).thenReturn(true);
+		when(userRepository.findByEmail(loginRequest.username())).thenReturn(Optional.empty());
+		when(userRepository.findByNickname(loginRequest.username())).thenReturn(Optional.of(user));
+		when(passwordEncoder.matches(loginRequest.password(), user.getPassword())).thenReturn(true);
 		when(jwtService.generateToken(uuidPublic)).thenReturn("jwt-token");
 
 		LoginResponse response = authService.login(loginRequest);
 
-		assertEquals("jwt-token", response.getToken());
-		assertEquals("Bearer", response.getTokenType());
+		assertEquals("jwt-token", response.token());
+		assertEquals("Bearer", response.tokenType());
 	}
 
 	@Test
 	void loginShouldThrowWhenUserDoesNotExist() {
-		when(userRepository.findByEmail(loginRequest.getUsername())).thenReturn(Optional.empty());
-		when(userRepository.findByNickname(loginRequest.getUsername())).thenReturn(Optional.empty());
+		when(userRepository.findByEmail(loginRequest.username())).thenReturn(Optional.empty());
+		when(userRepository.findByNickname(loginRequest.username())).thenReturn(Optional.empty());
 
 		UnauthorizedException exception = assertThrows(UnauthorizedException.class,
 				() -> authService.login(loginRequest));
@@ -191,8 +188,8 @@ class AuthServiceTest {
 		user.setEmail("maria@teste.com");
 		user.setPassword("encodedPassword");
 
-		when(userRepository.findByEmail(loginRequest.getUsername())).thenReturn(Optional.of(user));
-		when(passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())).thenReturn(false);
+		when(userRepository.findByEmail(loginRequest.username())).thenReturn(Optional.of(user));
+		when(passwordEncoder.matches(loginRequest.password(), user.getPassword())).thenReturn(false);
 
 		UnauthorizedException exception = assertThrows(UnauthorizedException.class,
 				() -> authService.login(loginRequest));
@@ -216,11 +213,11 @@ class AuthServiceTest {
 
 		MeResponse response = authService.me(uuidPublic);
 
-		assertTrue(response.isAuthenticated());
-		assertEquals("Maria Silva", response.getName());
-		assertEquals("maria@teste.com", response.getEmail());
-		assertEquals("maria", response.getNickname());
-		assertEquals(25, response.getAge());
+		assertTrue(response.authenticated());
+		assertEquals("Maria Silva", response.name());
+		assertEquals("maria@teste.com", response.email());
+		assertEquals("maria", response.nickname());
+		assertEquals(25, response.age());
 	}
 
 	@Test

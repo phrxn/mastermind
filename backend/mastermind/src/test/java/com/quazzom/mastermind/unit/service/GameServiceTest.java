@@ -123,12 +123,12 @@ class GameServiceTest {
 		assertEquals(GameStatus.IN_PROGRESS, savedGame.getStatus());
 		assertEquals(0, savedGame.getAttemptsUsed());
 
-		assertEquals(GameStatus.IN_PROGRESS, response.getStatus());
-		assertEquals(GameLevel.EASY, response.getGameLevel());
-		assertEquals(4, response.getNumberOfColumnColors());
-		assertEquals(GameEngine.MAX_ATTEMPTS, response.getMaximumOfattempts());
-		assertEquals(false, response.isRepeatedColorAllowed());
-		assertTrue(response.getRows().isEmpty());
+		assertEquals(GameStatus.IN_PROGRESS, response.status());
+		assertEquals(GameLevel.EASY, response.gameLevel());
+		assertEquals(4, response.numberOfColumnColors());
+		assertEquals(GameEngine.MAX_ATTEMPTS, response.maximumOfattempts());
+		assertEquals(false, response.repeatedColorAllowed());
+		assertTrue(response.rows().isEmpty());
 	}
 
 	@Test
@@ -172,10 +172,10 @@ class GameServiceTest {
 
 		assertInstanceOf(GameInProgressResponse.class, response);
 		GameInProgressResponse inProgressResponse = (GameInProgressResponse) response;
-		assertEquals(GameStatus.IN_PROGRESS, inProgressResponse.getStatus());
-		assertEquals(GameLevel.EASY, inProgressResponse.getGameLevel());
-		assertEquals(2, inProgressResponse.getTips().getCorrectPositions());
-		assertEquals(1, inProgressResponse.getTips().getCorrectColors());
+		assertEquals(GameStatus.IN_PROGRESS, inProgressResponse.status());
+		assertEquals(GameLevel.EASY, inProgressResponse.gameLevel());
+		assertEquals(2, inProgressResponse.tips().getCorrectPositions());
+		assertEquals(1, inProgressResponse.tips().getCorrectColors());
 
 		verify(gameBusinessRole).setGuess(guessValues);
 		verify(gameEngine).validateGuess(inProgressGame, guessValues);
@@ -207,9 +207,9 @@ class GameServiceTest {
 
 		assertInstanceOf(GameEndResponse.class, response);
 		GameEndResponse endResponse = (GameEndResponse) response;
-		assertEquals(GameStatus.WON, endResponse.getStatus());
-		assertEquals(GameLevel.EASY, endResponse.getGameLevel());
-		assertEquals(List.of(1, 2, 3, 4), endResponse.getSecret());
+		assertEquals(GameStatus.WON, endResponse.status());
+		assertEquals(GameLevel.EASY, endResponse.gameLevel());
+		assertEquals(List.of(1, 2, 3, 4), endResponse.secret());
 		assertEquals(GameStatus.WON, inProgressGame.getStatus());
 		assertNotNull(inProgressGame.getFinishedAt());
 	}
@@ -232,9 +232,9 @@ class GameServiceTest {
 
 		assertInstanceOf(GameEndResponse.class, response);
 		GameEndResponse endResponse = (GameEndResponse) response;
-		assertEquals(GameStatus.LOST, endResponse.getStatus());
-		assertEquals(GameLevel.EASY, endResponse.getGameLevel());
-		assertEquals(List.of(1, 2, 3, 4), endResponse.getSecret());
+		assertEquals(GameStatus.LOST, endResponse.status());
+		assertEquals(GameLevel.EASY, endResponse.gameLevel());
+		assertEquals(List.of(1, 2, 3, 4), endResponse.secret());
 		assertEquals(GameStatus.LOST, inProgressGame.getStatus());
 		assertNotNull(inProgressGame.getFinishedAt());
 		assertEquals(10, inProgressGame.getAttemptsUsed());
@@ -273,9 +273,9 @@ class GameServiceTest {
 
 		GameEndResponse response = gameService.giveUp(10L);
 
-		assertEquals(GameStatus.GAVE_UP, response.getStatus());
-		assertEquals(GameLevel.EASY, response.getGameLevel());
-		assertEquals(List.of(1, 2, 3, 4), response.getSecret());
+		assertEquals(GameStatus.GAVE_UP, response.status());
+		assertEquals(GameLevel.EASY, response.gameLevel());
+		assertEquals(List.of(1, 2, 3, 4), response.secret());
 		assertEquals(GameStatus.GAVE_UP, inProgressGame.getStatus());
 		assertNotNull(inProgressGame.getFinishedAt());
 		verify(gameRepository).save(inProgressGame);
@@ -330,15 +330,15 @@ class GameServiceTest {
 
 		assertTrue(responseOpt.isPresent());
 		GameStatusResponse response = responseOpt.get();
-		assertEquals(GameStatus.IN_PROGRESS, response.getStatus());
-		assertEquals(GameLevel.EASY, response.getGameLevel());
-		assertEquals(4, response.getNumberOfColumnColors());
-		assertEquals(GameEngine.MAX_ATTEMPTS, response.getMaximumOfattempts());
-		assertEquals(false, response.isRepeatedColorAllowed());
-		assertEquals(2, response.getRows().size());
-		assertEquals(List.of(1, 2, 4, 6), response.getRows().get(0).getGuess());
-		assertEquals(2, response.getRows().get(0).getTips().getCorrectPositions());
-		assertEquals(1, response.getRows().get(0).getTips().getCorrectColors());
+		assertEquals(GameStatus.IN_PROGRESS, response.status());
+		assertEquals(GameLevel.EASY, response.gameLevel());
+		assertEquals(4, response.numberOfColumnColors());
+		assertEquals(GameEngine.MAX_ATTEMPTS, response.maximumOfattempts());
+		assertEquals(false, response.repeatedColorAllowed());
+		assertEquals(2, response.rows().size());
+		assertEquals(List.of(1, 2, 4, 6), response.rows().get(0).guess());
+		assertEquals(2, response.rows().get(0).tips().getCorrectPositions());
+		assertEquals(1, response.rows().get(0).tips().getCorrectColors());
 	}
 
 	@Test
