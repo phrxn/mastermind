@@ -90,10 +90,10 @@ export interface RankingItem {
 }
 
 export interface RankingResponse {
-  top10EasyGamesList: RankingItem[];
-  top10NormalGamesList: RankingItem[];
-  top10HardGamesList: RankingItem[];
-  top10MastermindGamesList: RankingItem[];
+  top10EasyGames: RankingItem[];
+  top10NormalGames: RankingItem[];
+  top10HardGames: RankingItem[];
+  top10MastermindGames: RankingItem[];
 }
 
 export interface LevelOption {

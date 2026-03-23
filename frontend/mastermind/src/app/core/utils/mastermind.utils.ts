@@ -177,16 +177,16 @@ export function normalizeRankingResponse(value: unknown): RankingResponse {
   console.log(value);
   const source = (value as Record<string, unknown>) ?? {};
   return {
-    top10EasyGamesList: Array.isArray(source['top10EasyGames'])
+    top10EasyGames: Array.isArray(source['top10EasyGames'])
       ? source['top10EasyGames'].map((item) => normalizeRankingItem(item))
       : [],
-    top10NormalGamesList: Array.isArray(source['top10NormalGames'])
+    top10NormalGames: Array.isArray(source['top10NormalGames'])
       ? source['top10NormalGames'].map((item) => normalizeRankingItem(item))
       : [],
-    top10HardGamesList: Array.isArray(source['top10HardGames'])
+    top10HardGames: Array.isArray(source['top10HardGames'])
       ? source['top10HardGames'].map((item) => normalizeRankingItem(item))
       : [],
-    top10MastermindGamesList: Array.isArray(source['top10MastermindGames'])
+    top10MastermindGames: Array.isArray(source['top10MastermindGames'])
       ? source['top10MastermindGames'].map((item) => normalizeRankingItem(item))
       : []
   };
