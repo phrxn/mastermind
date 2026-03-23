@@ -4,10 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -111,20 +113,19 @@ public class GameRepositoryIntegrationTest {
 
         LocalDateTime base = LocalDateTime.now();
 
-
         // easy level
-							gameRepository.save(createGame(user1, GameLevel.EASY, 1, GameStatus.LOST, base.minusMinutes(6)));
-        Game easyExpected = gameRepository.save(createGame(user1, GameLevel.EASY, 3, GameStatus.WON,  base.minusMinutes(5)));
-                            gameRepository.save(createGame(user1, GameLevel.EASY, 3, GameStatus.WON,  base.minusMinutes(3)));
+        gameRepository.save(createGame(user1, GameLevel.EASY, 1, GameStatus.LOST, base.minusMinutes(6)));
+        Game easyExpected = gameRepository.save(createGame(user1, GameLevel.EASY, 3, GameStatus.WON, base.minusMinutes(5)));
+        gameRepository.save(createGame(user1, GameLevel.EASY, 3, GameStatus.WON, base.minusMinutes(3)));
 
         // normal level
-		                      gameRepository.save(createGame(user1, GameLevel.NORMAL, 1, GameStatus.GAVE_UP, base.minusMinutes(6)));
-        Game normalExpected = gameRepository.save(createGame(user1, GameLevel.NORMAL, 2, GameStatus.WON,     base.minusMinutes(5)));
-							  gameRepository.save(createGame(user1, GameLevel.NORMAL, 2, GameStatus.WON,     base.minusMinutes(4)));
+        gameRepository.save(createGame(user1, GameLevel.NORMAL, 1, GameStatus.GAVE_UP, base.minusMinutes(6)));
+        Game normalExpected = gameRepository.save(createGame(user1, GameLevel.NORMAL, 2, GameStatus.WON, base.minusMinutes(5)));
+        gameRepository.save(createGame(user1, GameLevel.NORMAL, 2, GameStatus.WON, base.minusMinutes(4)));
 
         // hard level
-		                    gameRepository.save(createGame(user1, GameLevel.HARD, 1, GameStatus.IN_PROGRESS, base.minusMinutes(7)));
-        Game hardExpected = gameRepository.save(createGame(user1, GameLevel.HARD, 6, GameStatus.WON,         base.minusMinutes(3)));
+        gameRepository.save(createGame(user1, GameLevel.HARD, 1, GameStatus.IN_PROGRESS, base.minusMinutes(7)));
+        Game hardExpected = gameRepository.save(createGame(user1, GameLevel.HARD, 6, GameStatus.WON, base.minusMinutes(3)));
 
         // other user (ignore)
         gameRepository.save(createGame(user2, GameLevel.EASY, 1, GameStatus.WON, base.minusMinutes(1)));
@@ -217,26 +218,20 @@ public class GameRepositoryIntegrationTest {
         assertTrue(result.stream().allMatch(g -> g.getUser().getId().equals(user1.getId())));
     }
 
-
-
-
-
-
     @Test
     void shouldFindGameWhenStatusIsDifferent() {
 
         User user = createUser("User 1", "user1@email.com", "user1", 25, "123");
-		userRepository.save(user);
+        userRepository.save(user);
 
         Game game = gameRepository.save(createGame(user, GameLevel.EASY, 3, GameStatus.WON, LocalDateTime.now()));
 
-
         Optional<Game> result = gameRepository
-            .findByUserIdAndUuidPublicAndStatusNot(
-                user.getId(),
-                game.getUuidPublic(),
-                GameStatus.IN_PROGRESS
-            );
+                .findByUserIdAndUuidPublicAndStatusNot(
+                        user.getId(),
+                        game.getUuidPublic(),
+                        GameStatus.IN_PROGRESS
+                );
 
         assertTrue(result.isPresent());
         assertEquals(game.getId(), result.get().getId());
@@ -246,18 +241,18 @@ public class GameRepositoryIntegrationTest {
     void shouldReturnEmpty_whenStatusIsSame() {
 
         User user = createUser("User 1", "user1@email.com", "user1", 25, "123");
-		userRepository.save(user);
+        userRepository.save(user);
 
         Game game = gameRepository.save(
-            createGame(user, GameLevel.EASY, 3, GameStatus.WON, LocalDateTime.now())
+                createGame(user, GameLevel.EASY, 3, GameStatus.WON, LocalDateTime.now())
         );
 
         Optional<Game> result = gameRepository
-            .findByUserIdAndUuidPublicAndStatusNot(
-                user.getId(),
-                game.getUuidPublic(),
-                GameStatus.WON
-            );
+                .findByUserIdAndUuidPublicAndStatusNot(
+                        user.getId(),
+                        game.getUuidPublic(),
+                        GameStatus.WON
+                );
 
         assertTrue(result.isEmpty());
     }
@@ -265,21 +260,21 @@ public class GameRepositoryIntegrationTest {
     @Test
     void shouldReturnEmpty_whenUserIdDoesNotMatch() {
 
-        User user1 =  createUser("User 1", "user1@email.com", "user1", 25, "123");
-		userRepository.save(user1);
-        User user2 =  createUser("User 2", "user2@email.com", "user2", 30, "123");
-		userRepository.save(user2);
+        User user1 = createUser("User 1", "user1@email.com", "user1", 25, "123");
+        userRepository.save(user1);
+        User user2 = createUser("User 2", "user2@email.com", "user2", 30, "123");
+        userRepository.save(user2);
 
         Game game = gameRepository.save(
-            createGame(user1, GameLevel.EASY, 3, GameStatus.WON, LocalDateTime.now())
+                createGame(user1, GameLevel.EASY, 3, GameStatus.WON, LocalDateTime.now())
         );
 
         Optional<Game> result = gameRepository
-            .findByUserIdAndUuidPublicAndStatusNot(
-                user2.getId(), // wrong user
-                game.getUuidPublic(),
-                GameStatus.IN_PROGRESS
-            );
+                .findByUserIdAndUuidPublicAndStatusNot(
+                        user2.getId(), // wrong user
+                        game.getUuidPublic(),
+                        GameStatus.IN_PROGRESS
+                );
 
         assertTrue(result.isEmpty());
     }
@@ -288,29 +283,116 @@ public class GameRepositoryIntegrationTest {
     void shouldReturnEmpty_whenUuidDoesNotMatch() {
 
         User user = createUser("User 1", "user1@email.com", "user1", 25, "123");
-		userRepository.save(user);
+        userRepository.save(user);
 
         gameRepository.save(createGame(user, GameLevel.EASY, 3, GameStatus.WON, LocalDateTime.now()));
 
         Optional<Game> result = gameRepository
-            .findByUserIdAndUuidPublicAndStatusNot(
-                user.getId(),
-                new java.util.UUID(0L, 0L), // wrong uuid
-                GameStatus.IN_PROGRESS
-            );
+                .findByUserIdAndUuidPublicAndStatusNot(
+                        user.getId(),
+                        new java.util.UUID(0L, 0L), // wrong uuid
+                        GameStatus.IN_PROGRESS
+                );
 
         assertTrue(result.isEmpty());
     }
 
+    @Test
+    void shouldReturnTop10OrderedByAttemptsAndCreatedAt() {
+
+		//lets clean the table... other tests may have left residue
+		gameRepository.deleteAll();
+
+        User user = createUser("User 1", "user1@email.com", "user1", 25, "123");
+        user = userRepository.save(user);
+        for (int i = 0; i < 15; i++) {
+            Game game = createGame(user, GameLevel.EASY, (15 - i), GameStatus.WON, LocalDateTime.now().minusDays(i));
+            gameRepository.save(game);
+        }
+
+        List<Game> result = gameRepository.findTop10ByLevelAndStatusOrderByAttemptsUsedAscCreatedAtAsc(GameLevel.EASY, GameStatus.WON);
+        assertThat(result).hasSize(10);
+        for (int i = 0; i < result.size() - 1; i++) {
+            Game current = result.get(i);
+            Game next = result.get(i + 1);
+            if (current.getAttemptsUsed().equals(next.getAttemptsUsed())) {
+                assertThat(current.getCreatedAt()).isBeforeOrEqualTo(next.getCreatedAt());
+            } else {
+                assertThat(current.getAttemptsUsed()).isLessThanOrEqualTo(next.getAttemptsUsed());
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("should ignore games with different status")
+    void shouldIgnoreNonWonGames() {
+
+		//lets clean the table... other tests may have left residue
+		gameRepository.deleteAll();
+
+        User user = createUser("User 1", "user1@email.com", "user1", 25, "123");
+        user = userRepository.save(user);
+
+        Game wonGame = createGame(user, GameLevel.NORMAL, 3, GameStatus.WON, LocalDateTime.now());
+        gameRepository.save(wonGame);
+
+        Game lostGame = createGame(user, GameLevel.NORMAL, 1, GameStatus.LOST, LocalDateTime.now().minusDays(1));
+        gameRepository.save(lostGame);
+
+        List<Game> result = gameRepository.findTop10ByLevelAndStatusOrderByAttemptsUsedAscCreatedAtAsc(GameLevel.NORMAL, GameStatus.WON);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getStatus()).isEqualTo(GameStatus.WON);
+    }
+
+    @Test
+    void shouldFilterByLevel() {
+
+		//lets clean the table... other tests may have left residue
+		gameRepository.deleteAll();
+
+        User user = createUser("User 1", "user1@email.com", "user1", 25, "123");
+        user = userRepository.save(user);
+
+        Game easyGame = createGame(user, GameLevel.EASY, 2, GameStatus.WON, LocalDateTime.now());
+        gameRepository.save(easyGame);
+
+        Game hardGame = createGame(user, GameLevel.HARD, 1, GameStatus.WON, LocalDateTime.now());
+        gameRepository.save(hardGame);
+
+        List<Game> result = gameRepository.findTop10ByLevelAndStatusOrderByAttemptsUsedAscCreatedAtAsc(GameLevel.EASY, GameStatus.WON);
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getLevel()).isEqualTo(GameLevel.EASY);
+    }
+
+    @Test
+    void shouldRespectCreatedAtWhenAttemptsAreEqual() {
+
+		//lets clean the table... other tests may have left residue
+		gameRepository.deleteAll();
+
+        User user = createUser("User 1", "user1@email.com", "user1", 25, "123");
+        user = userRepository.save(user);
+
+        Game older = createGame(user, GameLevel.HARD, 3, GameStatus.WON, LocalDateTime.now().minusDays(2));
+        gameRepository.save(older);
+
+        Game newer = createGame(user, GameLevel.HARD, 3, GameStatus.WON, LocalDateTime.now());
+        gameRepository.save(newer);
+
+        List<Game> result = gameRepository.findTop10ByLevelAndStatusOrderByAttemptsUsedAscCreatedAtAsc(GameLevel.HARD, GameStatus.WON);
+        assertThat(result).hasSize(2);
+        assertThat(result.get(0).getCreatedAt()).isBeforeOrEqualTo(result.get(1).getCreatedAt());
+    }
+
     private User createUser(String username, String email, String nickname, Integer age, String password) {
-		User user = new User();
-		user.setName(username);
-		user.setEmail(email);
-		user.setNickname(nickname);
-		user.setAge(age);
-		user.setPassword(password);
-		return user;
-	}
+        User user = new User();
+        user.setName(username);
+        user.setEmail(email);
+        user.setNickname(nickname);
+        user.setAge(age);
+        user.setPassword(password);
+        return user;
+    }
 
     private Game createGame(User user, GameLevel level, int attempts, GameStatus status, LocalDateTime createdAt) {
         Game g = new Game();

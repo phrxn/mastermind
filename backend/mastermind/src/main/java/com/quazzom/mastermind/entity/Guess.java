@@ -2,6 +2,8 @@ package com.quazzom.mastermind.entity;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,6 +22,7 @@ public class Guess {
 
 	@ManyToOne
 	@JoinColumn(name = "game_id", nullable = false)
+	@JsonIgnore
 	private Game game;
 
 	private Integer attemptNumber;

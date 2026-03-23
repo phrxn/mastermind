@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.quazzom.mastermind.entity.Game;
+import com.quazzom.mastermind.entity.GameLevel;
 import com.quazzom.mastermind.entity.GameStatus;
 
 public interface GameRepository extends JpaRepository<Game, Long> {
@@ -55,5 +56,7 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 	""")
 	List<Game> findBestGamesPerLevel(@Param("userId") Long userId);
 
+	List<Game> findTop10ByLevelAndStatusOrderByAttemptsUsedAscCreatedAtAsc(GameLevel level,GameStatus status);
 
+	Optional<Game> findByUuidPublic(UUID uuidPublic);
 }

@@ -8,6 +8,8 @@ import java.util.UUID;
 import org.hibernate.annotations.Generated;
 import org.hibernate.generator.EventType;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,6 +36,7 @@ public class User {
 	private String email;
 	private String nickname;
 	private Integer age = 0;
+	@JsonIgnore
 	private String password;
 
 	private Integer loginAttempts = 0;
@@ -41,6 +44,7 @@ public class User {
 	private LocalDateTime createdAt = LocalDateTime.now();
 
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Game> games = new ArrayList<>();
 
 	public Long getId() {

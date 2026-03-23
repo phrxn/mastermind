@@ -17,7 +17,6 @@ import com.quazzom.mastermind.dto.GameStatusRowResponse;
 import com.quazzom.mastermind.dto.UserPasswordRequest;
 import com.quazzom.mastermind.dto.UserProfileRequest;
 import com.quazzom.mastermind.dto.UserProfileResponse;
-import com.quazzom.mastermind.entity.CalcGamePoints;
 import com.quazzom.mastermind.entity.Game;
 import com.quazzom.mastermind.entity.GameStatus;
 import com.quazzom.mastermind.entity.Guess;
@@ -28,6 +27,7 @@ import com.quazzom.mastermind.exception.UserAlreadyExistsException;
 import com.quazzom.mastermind.repository.GameRepository;
 import com.quazzom.mastermind.repository.GuessRepository;
 import com.quazzom.mastermind.repository.UserRepository;
+import com.quazzom.mastermind.utils.CreateGameHistoryItemResponse;
 import com.quazzom.mastermind.utils.SecretDecoder;
 import com.quazzom.mastermind.validator.UserPasswordRequestValidator;
 import com.quazzom.mastermind.validator.UserProfileRequestValidator;
@@ -44,13 +44,16 @@ public class UserService {
 
     private final SecretDecoder secretDecoder;
 
+	private CreateGameHistoryItemResponse calcGamePoints;
+
     public UserService(UserRepository userRepository,
             GameRepository gameRepository,
             GuessRepository guessRepository,
             UserProfileRequestValidator userProfileRequestValidator,
             UserPasswordRequestValidator userPasswordRequestValidator,
             PasswordEncoder passwordEncoder,
-            SecretDecoder secretDecoder) {
+            SecretDecoder secretDecoder,
+            CreateGameHistoryItemResponse calcGamePoints) {
         this.userRepository = userRepository;
         this.gameRepository = gameRepository;
         this.guessRepository = guessRepository;
@@ -58,6 +61,7 @@ public class UserService {
         this.userPasswordRequestValidator = userPasswordRequestValidator;
         this.passwordEncoder = passwordEncoder;
         this.secretDecoder = secretDecoder;
+		this.calcGamePoints = calcGamePoints;
     }
 
     public UserProfileResponse getProfile(UUID uuidPublic) {
@@ -110,7 +114,7 @@ public class UserService {
         List<Game> userTopGamesByLevel = gameRepository.findBestGamesPerLevel(user.getId());
         List<Game> userGameHistory = gameRepository.findHistoryByUserId(user.getId());
 
-        CalcGamePoints calcGamePoints = new CalcGamePoints();
+        calcGamePoints = new CreateGameHistoryItemResponse();
 
         List<GameHistoryItemResponse> gameHistoryBestGames = userTopGamesByLevel.stream()
                 .map(game -> calcGamePoints.calculatePoints(game))
