@@ -127,6 +127,35 @@ p {
   align-items: safe center;
 }
 
+.auth-layout-login,
+.auth-layout-signup {
+  position: relative;
+  isolation: isolate;
+}
+
+.auth-layout-login::before,
+.auth-layout-signup::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url('/images/background_login_screen.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.26;
+  mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 1) 58%, rgba(0, 0, 0, 0) 100%);
+}
+
+.auth-layout-login > *,
+.auth-layout-signup > * {
+  position: relative;
+  z-index: 1;
+}
+
 .hero-copy {
   display: grid;
   gap: 1rem;

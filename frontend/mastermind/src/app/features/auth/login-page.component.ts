@@ -12,7 +12,7 @@ import { ApiSettingsPanelComponent } from '../../shared/components/api-settings-
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink, ApiSettingsPanelComponent],
   template: `
-    <section class="auth-layout">
+    <section class="auth-layout auth-layout-login">
       <div class="hero-copy">
         <p class="eyebrow login-main-title">Mastermind online</p>
         <h1>Entre e se torne o rei dos códigos!</h1>
