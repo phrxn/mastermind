@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 
 const STORAGE_KEY = 'mastermind.api.baseUrl';
-const DEFAULT_API_URL = 'http://localhost:8080';
+const DEFAULT_API_URL = 'http://localhost:8080/api/v1';
 
 @Injectable({ providedIn: 'root' })
 export class ApiSettingsService {

@@ -1,6 +1,6 @@
 services:
   #serviço de banco de dados, esse container vai ser usado pela API
-  mariadb:
+  mastermind-mariadb:
     build:
       context: ./infra/database
     image: mastermind-mariadb
@@ -16,26 +16,36 @@ services:
     networks:
       - mastermind
 
-  #serviço de banco de dados de teste, esse container vai ser usados para testes de integração
-  #por parte da API.
-  mariadb-test:
+  mastermind-api:
     build:
-      context: ./infra/database
-    image: mastermind-mariadb
-    container_name: mastermind-db-test
+      context: ./backend/mastermind
+    image: mastermind-api
+    container_name: mastermind-api
     restart: always
     environment:
+      MARIADB_HOST: "mastermind-mariadb"
+      MARIADB_PORT: "3306"
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
       MARIADB_DATABASE: ${MARIADB_DATABASE}
       MARIADB_USER: ${MARIADB_USER}
       MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_SECONDS: ${JWT_EXPIRATION_SECONDS}
     ports:
-      - "${MARIADB_HOST_PORT_DB_TEST}:3306"
+      - "8080:8080"
     networks:
       - mastermind
 
-
-
+  mastermind-website:
+    build:
+      context: ./frontend/mastermind
+    image: mastermind-website
+    container_name: mastermind-website
+    restart: always
+    ports:
+      - "4200:80"
+    networks:
+      - mastermind
 
 networks:
   mastermind:
