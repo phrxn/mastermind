@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
 import { GameBoardState } from '../../core/models/mastermind.models';
-import { buildGuessSlots, buildTipsGrid } from '../../core/utils/mastermind.utils';
+import { buildGuessSlots, buildTipsGrid, levelLabels } from '../../core/utils/mastermind.utils';
 
 @Component({
   selector: 'app-mastermind-board',
@@ -13,11 +13,11 @@ import { buildGuessSlots, buildTipsGrid } from '../../core/utils/mastermind.util
         <div class="board-header">
           <div>
             <p class="eyebrow">Tabuleiro</p>
-            <h2>{{ board()!.gameLevel }}</h2>
+            <h2>{{ levelLabels[board()!.gameLevel] }}</h2>
           </div>
           <div class="board-meta">
             <span>{{ board()!.rows.length }}/{{ board()!.maximumOfAttempts }} tentativas</span>
-            <span>{{ board()!.numberOfColumnColors }} casas</span>
+            <span>{{ board()!.numberOfColumnColors }} cores</span>
           </div>
         </div>
 
@@ -64,6 +64,7 @@ import { buildGuessSlots, buildTipsGrid } from '../../core/utils/mastermind.util
   `
 })
 export class MastermindBoardComponent {
+  readonly levelLabels = levelLabels;
   readonly board = input<GameBoardState | null>(null);
   readonly revealSecret = input(false);
   readonly activeGuess = input<number[]>([]);

@@ -81,7 +81,7 @@ import { MastermindBoardComponent } from '../../shared/components/mastermind-boa
 
             <ul class="stat-list">
               <li>
-                <span>Casas por linha</span>
+                <span>Cores por linha</span>
                 <strong>{{ board()!.numberOfColumnColors }}</strong>
               </li>
               <li>

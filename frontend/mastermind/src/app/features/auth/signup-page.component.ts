@@ -13,11 +13,8 @@ import { formatApiError } from '../../core/utils/mastermind.utils';
   template: `
     <section class="auth-layout auth-layout-signup">
       <div class="hero-copy">
-        <p class="eyebrow">Novo jogador</p>
-        <h1>Crie a conta e prepare a primeira combinação.</h1>
-        <p>
-          Cadastro simples com os campos pedidos pela API e o mesmo visual do jogo para manter a navegação coesa.
-        </p>
+        <p class="eyebrow login-main-title">Novo jogador</p>
+        <h1>Crie a sua conta e prepare a primeira combinação.</h1>
       </div>
 
       <form class="card-surface auth-card" [formGroup]="form" (ngSubmit)="openConfirmDialog()">
@@ -30,25 +27,23 @@ import { formatApiError } from '../../core/utils/mastermind.utils';
 
         <label class="form-field">
           <span>Nome</span>
-          <input type="text" formControlName="name" autocomplete="name" />
+          <input type="text" formControlName="name" autocomplete="name" placeholder="Seu nome" />
         </label>
 
         <label class="form-field">
           <span>Email</span>
-          <input type="email" formControlName="email" autocomplete="email" />
+          <input type="email" formControlName="email" autocomplete="email" placeholder="Exemplo: usuario@exemplo.com" />
         </label>
 
-        <div class="form-grid two-columns">
-          <label class="form-field">
-            <span>Nickname</span>
-            <input type="text" formControlName="nickname" autocomplete="nickname" />
-          </label>
+        <label class="form-field">
+          <span>Nickname</span>
+          <input type="text" formControlName="nickname" autocomplete="nickname" placeholder="Seu apelido" />
+        </label>
 
-          <label class="form-field">
-            <span>Idade</span>
-            <input type="number" formControlName="age" min="1" />
-          </label>
-        </div>
+        <label class="form-field">
+          <span>Idade</span>
+          <input type="number" formControlName="age" min="1" />
+        </label>
 
         <label class="form-field">
           <span>Senha</span>
@@ -103,7 +98,7 @@ export class SignupPageComponent {
     email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
     nickname: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     age: new FormControl(18, { nonNullable: true, validators: [Validators.required, Validators.min(1)] }),
-    password: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(6)] })
+    password: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(1)] })
   });
 
   openConfirmDialog(): void {
