@@ -71,6 +71,7 @@ body::before {
 
 .eyebrow.login-main-title {
   font-size: 32px;
+  line-height: 1.05;
 }
 
 button,
@@ -126,6 +127,7 @@ p {
   display: grid;
   gap: 1rem;
   max-width: 32rem;
+  min-width: 0;
 }
 
 .hero-copy h1 {
@@ -143,6 +145,7 @@ p {
 .page-stack {
   display: grid;
   gap: 1rem;
+  min-width: 0;
 }
 
 .auth-card,
@@ -153,6 +156,7 @@ p {
   border-radius: 1.5rem;
   box-shadow: var(--shadow);
   padding: 1.25rem;
+  min-width: 0;
 }
 
 .section-heading,
@@ -161,6 +165,7 @@ p {
   align-items: start;
   justify-content: space-between;
   gap: 1rem;
+  min-width: 0;
 }
 
 .section-heading {
@@ -555,6 +560,21 @@ p {
   gap: 0.75rem;
   align-items: center;
   margin-bottom: 0.9rem;
+  min-width: 0;
+}
+
+.history-card-top > div {
+  min-width: 0;
+}
+
+.history-card-top strong,
+.ranking-subtitle,
+.dialog-message,
+.hero-copy p,
+.hero-copy h1,
+.section-heading h2,
+.section-heading h3 {
+  overflow-wrap: anywhere;
 }
 
 .card-data-grid {
@@ -562,6 +582,7 @@ p {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.85rem;
   margin: 0;
+  min-width: 0;
 }
 
 .card-data-grid dt {
@@ -741,12 +762,13 @@ p {
 
 .table-shell {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .score-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 40rem;
+  min-width: 32rem;
 }
 
 .score-table th,
@@ -815,8 +837,14 @@ p {
   margin-bottom: 4rem;
 }
 
+.page-stack img,
 img.smooth-board {
+  display: block;
+  max-width: 100%;
   height: auto;
+}
+
+img.smooth-board {
   border-radius: 1rem;
   box-shadow: var(--image-shadow);
 }
@@ -861,7 +889,7 @@ img.smooth-board {
 
 @media (max-width: 899px) {
   .app-shell {
-    padding-top: 0.75rem;
+    padding: 0.75rem;
   }
 
   .side-nav {
@@ -876,5 +904,138 @@ img.smooth-board {
 
   .tips-grid {
     justify-content: start;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-layout,
+  .app-shell {
+    min-height: auto;
+  }
+
+  .auth-layout,
+  .app-shell,
+  .shell-content {
+    gap: 0.75rem;
+  }
+
+  .auth-layout {
+    padding: 0.875rem;
+  }
+
+  .app-shell {
+    padding: 0.625rem;
+  }
+
+  .mobile-topbar,
+  .card-surface,
+  .auth-card,
+  .dialog-panel {
+    padding: 1rem;
+    border-radius: 1.1rem;
+  }
+
+  .mobile-topbar {
+    top: 0.5rem;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .section-heading,
+  .section-heading.compact,
+  .history-card-top,
+  .pagination-bar,
+  .dialog-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .section-heading .status-pill,
+  .history-card-top .status-pill,
+  .history-card-top .level-pill {
+    align-self: flex-start;
+  }
+
+  .eyebrow.login-main-title {
+    font-size: 1.5rem;
+  }
+
+  .hero-copy {
+    gap: 0.75rem;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(1.8rem, 9vw, 2.4rem);
+    line-height: 1;
+  }
+
+  .hero-copy p:last-child {
+    font-size: 0.94rem;
+  }
+
+  .two-columns,
+  .card-data-grid,
+  .ranking-card {
+    grid-template-columns: 1fr;
+  }
+
+  .ranking-card {
+    gap: 0.75rem;
+  }
+
+  .ranking-position {
+    min-width: 2.75rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1rem;
+  }
+
+  .status-pill,
+  .level-pill {
+    font-size: 0.92rem;
+    padding: 0.4rem 0.72rem;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .danger-button,
+  .ghost-button,
+  .text-link,
+  .logout-button,
+  .menu-toggle,
+  .tab-button {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .inline-actions,
+  .action-row,
+  .tabs-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nav-links a,
+  .logout-button {
+    width: 100%;
+  }
+
+  .score-table {
+    min-width: 26rem;
+  }
+
+  .score-table th,
+  .score-table td {
+    padding: 0.7rem 0.55rem;
+    font-size: 0.88rem;
+  }
+
+  .next-paraph {
+    margin-bottom: 2rem;
+  }
+
+  .dialog-backdrop {
+    padding: 0.75rem;
   }
 }
