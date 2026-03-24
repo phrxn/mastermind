@@ -73,7 +73,7 @@ describe('SignupPageComponent', () => {
       age: 24,
       password: '123456'
     });
-    expect(component.success()).toContain('Conta criada');
+    expect(component.success()).toContain('Você já pode fazer login');
     expect(router.navigate).toHaveBeenCalledWith(['/auth/login']);
   }));
 });

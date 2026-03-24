@@ -42,44 +42,44 @@ const STATUS_MAP: Record<string, GameStatus> = {
 export const levelOptions: LevelOption[] = [
   {
     level: 'EASY',
-    label: 'Easy',
-    description: '4 cores, sem repeticao e uma partida mais rapida.',
+    label: 'Fácil',
+    description: '4 cores, sem repetição. Uma partida ideal para quem está começando.',
     columns: 4,
     repeatedColors: false
   },
   {
     level: 'NORMAL',
     label: 'Normal',
-    description: '4 cores com repeticao liberada para aumentar a leitura do tabuleiro.',
+    description: '4 cores, com repetição. Nível normal do jogo clássico.',
     columns: 4,
     repeatedColors: true
   },
   {
     level: 'HARD',
-    label: 'Hard',
-    description: '6 cores sem repeticao e mais combinacoes para testar memoria.',
+    label: 'Difícil',
+    description: '6 cores, sem repetição. Ideal para quem já conhece o jogo e quer um desafio maior.',
     columns: 6,
     repeatedColors: false
   },
   {
     level: 'MASTERMIND',
     label: 'Mastermind',
-    description: '6 cores, repeticao liberada e o desafio completo.',
+    description: '6 cores, com repetição. O desafio definitivo para os verdadeiros Masterminds!',
     columns: 6,
     repeatedColors: true
   }
 ];
 
 export const levelLabels: Record<GameLevel, string> = {
-  EASY: 'Easy',
+  EASY: 'Fácil',
   NORMAL: 'Normal',
-  HARD: 'Hard',
+  HARD: 'Difícil',
   MASTERMIND: 'Mastermind'
 };
 
 export const statusLabels: Record<GameStatus, string> = {
   IN_PROGRESS: 'Em andamento',
-  WON: 'Vitoria',
+  WON: 'Vitória',
   LOST: 'Derrota',
   GAVE_UP: 'Desistiu'
 };
@@ -187,7 +187,7 @@ export function normalizeRankingResponse(value: unknown): RankingResponse {
   };
 }
 
-export function formatApiError(error: unknown, fallback = 'Nao foi possivel concluir a operacao.'): string {
+export function formatApiError(error: unknown, fallback = 'Não foi possível concluir a operação.'): string {
   if (!error || typeof error !== 'object') {
     return fallback;
   }

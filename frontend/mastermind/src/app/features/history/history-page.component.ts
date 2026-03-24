@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
-import { GameLevel, HistoryResponse, HistorySummaryItem } from '../../core/models/mastermind.models';
+import { GameLevel, GameStatus, HistoryResponse, HistorySummaryItem } from '../../core/models/mastermind.models';
 import { HistoryService } from '../../core/services/history.service';
 import { formatApiError, levelLabels, levelOptions, statusLabels } from '../../core/utils/mastermind.utils';
 
@@ -14,21 +14,21 @@ import { formatApiError, levelLabels, levelOptions, statusLabels } from '../../c
     <section class="page-stack">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Historico</p>
+          <p class="eyebrow">Histórico</p>
           <h2>Suas partidas</h2>
         </div>
       </div>
 
       @if (loading()) {
-        <section class="card-surface loading-card">Buscando historico...</section>
+        <section class="card-surface loading-card">Buscando histórico...</section>
       } @else if (error()) {
         <section class="card-surface feedback error">{{ error() }}</section>
       } @else {
         <section class="card-surface">
           <div class="section-heading compact">
             <div>
-              <p class="eyebrow">Melhores pontuacoes</p>
-              <h3>Resumo por nivel</h3>
+              <p class="eyebrow">Melhores pontuações</p>
+              <h3>Resumo por nível</h3>
             </div>
           </div>
 
@@ -36,7 +36,7 @@ import { formatApiError, levelLabels, levelOptions, statusLabels } from '../../c
             <table class="score-table">
               <thead>
                 <tr>
-                  <th>Nivel</th>
+                  <th>Nível</th>
                   <th>Pontos</th>
                   <th>Tentativas</th>
                   <th>Jogando em</th>
@@ -61,7 +61,7 @@ import { formatApiError, levelLabels, levelOptions, statusLabels } from '../../c
         <section class="page-stack">
           <div class="section-heading compact">
             <div>
-              <p class="eyebrow">Historico completo</p>
+              <p class="eyebrow">Histórico completo</p>
               <h3>{{ history()?.gameHistoryFull?.length ?? 0 }} partidas registradas</h3>
             </div>
           </div>
@@ -74,7 +74,7 @@ import { formatApiError, levelLabels, levelOptions, statusLabels } from '../../c
                 <button type="button" class="history-card card-surface" (click)="openDetail(item.publicUuid)">
                   <div class="history-card-top">
                     <strong>{{ levelLabels[item.level] }}</strong>
-                    <span class="status-pill">{{ statusLabels[item.status] }}</span>
+                    <span class="status-pill" [ngClass]="statusClasses[item.status]">{{ statusLabels[item.status] }}</span>
                   </div>
                   <dl class="card-data-grid">
                     <div><dt>Pontos</dt><dd>{{ item.pointsMaked }}</dd></div>
@@ -88,8 +88,8 @@ import { formatApiError, levelLabels, levelOptions, statusLabels } from '../../c
 
             <div class="pagination-bar card-surface">
               <button type="button" class="secondary-button" (click)="previousPage()" [disabled]="pageIndex() === 0">Voltar</button>
-              <span>Pagina {{ pageIndex() + 1 }} de {{ totalPages() }}</span>
-              <button type="button" class="secondary-button" (click)="nextPage()" [disabled]="pageIndex() + 1 >= totalPages()">Proxima</button>
+              <span>Página {{ pageIndex() + 1 }} de {{ totalPages() }}</span>
+              <button type="button" class="secondary-button" (click)="nextPage()" [disabled]="pageIndex() + 1 >= totalPages()">Próxima</button>
             </div>
           }
         </section>
@@ -98,6 +98,14 @@ import { formatApiError, levelLabels, levelOptions, statusLabels } from '../../c
   `
 })
 export class HistoryPageComponent {
+
+  statusClasses: Record<GameStatus, string> = {
+    'IN_PROGRESS': 'status-pill-in-progress',
+    'WON': 'status-pill-won',
+    'LOST': 'status-pill-lost',
+    'GAVE_UP': 'status-pill-gave-up'
+  };
+
   private readonly historyService = inject(HistoryService);
   private readonly router = inject(Router);
 
@@ -135,7 +143,7 @@ export class HistoryPageComponent {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (history) => this.history.set(history),
-        error: (error) => this.error.set(formatApiError(error, 'Nao foi possivel carregar o historico.'))
+        error: (error) => this.error.set(formatApiError(error, 'Não foi possível carregar o histórico.'))
       });
   }
 

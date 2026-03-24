@@ -39,6 +39,6 @@ describe('ProfilePageComponent', () => {
     component.changePassword();
 
     expect(profileService.changePassword).not.toHaveBeenCalled();
-    expect(component.passwordFeedback()).toContain('confirmacao da senha');
+    expect(component.passwordFeedback()).toContain('confirmação da senha');
   });
 });

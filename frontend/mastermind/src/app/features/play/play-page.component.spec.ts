@@ -60,7 +60,38 @@ describe('PlayPageComponent', () => {
     expect(gameService.submitGuess).toHaveBeenCalledWith([1, 2, 3, 4]);
   });
 
-  it('should open a custom confirmation dialog before giving up', () => {
+  it('should open a custom confirmation dialog before starting a game', () => {
+    gameService.getCurrentGame.and.returnValue(of(null));
+    gameService.createGame.and.returnValue(
+      of({
+        status: 'IN_PROGRESS',
+        gameLevel: 'EASY',
+        numberOfColumnColors: 4,
+        maximumOfAttempts: 10,
+        repeatedColorAllowed: false,
+        rows: []
+      })
+    );
+
+    const fixture = TestBed.createComponent(PlayPageComponent);
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    const startButton = fixture.nativeElement.querySelector('.level-card') as HTMLButtonElement;
+    startButton.click();
+    fixture.detectChanges();
+
+    expect(component.confirmDialogOpen()).toBeTrue();
+    expect(gameService.createGame).not.toHaveBeenCalled();
+
+    const confirmButton = Array.from(fixture.nativeElement.querySelectorAll('.dialog-panel button'))[1] as HTMLButtonElement;
+    confirmButton.click();
+    fixture.detectChanges();
+
+    expect(gameService.createGame).toHaveBeenCalledWith('EASY');
+  });
+
+  it('should give up without confirmation when there is no attempt yet', () => {
     const fixture = TestBed.createComponent(PlayPageComponent);
     const component = fixture.componentInstance;
     fixture.detectChanges();
@@ -69,7 +100,37 @@ describe('PlayPageComponent', () => {
     giveUpButton.click();
     fixture.detectChanges();
 
+    expect(component.confirmDialogOpen()).toBeFalse();
+    expect(fixture.nativeElement.querySelector('.dialog-panel')).toBeNull();
+    expect(gameService.giveUp).toHaveBeenCalled();
+  });
+
+  it('should open a custom confirmation dialog before giving up after at least one attempt', () => {
+    const fixture = TestBed.createComponent(PlayPageComponent);
+    const component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    component.board.set({
+      status: 'IN_PROGRESS',
+      gameLevel: 'EASY',
+      numberOfColumnColors: 4,
+      maximumOfAttempts: 10,
+      repeatedColorAllowed: false,
+      rows: [
+        {
+          guess: [1, 2, 3, 4],
+          tips: { correctPositions: 1, correctColors: 1 }
+        }
+      ]
+    });
+    fixture.detectChanges();
+
+    const giveUpButton = fixture.nativeElement.querySelector('.danger-button') as HTMLButtonElement;
+    giveUpButton.click();
+    fixture.detectChanges();
+
     expect(component.confirmDialogOpen()).toBeTrue();
+    expect(gameService.giveUp).not.toHaveBeenCalled();
 
     const confirmButton = Array.from(fixture.nativeElement.querySelectorAll('.dialog-panel button'))[1] as HTMLButtonElement;
     confirmButton.click();

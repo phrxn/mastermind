@@ -13,7 +13,7 @@ import { AuthService } from '../../core/services/auth.service';
         <button type="button" class="menu-toggle" (click)="toggleMenu()">Menu</button>
         <div>
           <p class="eyebrow">Mastermind</p>
-          <strong>{{ authService.username() || 'Player' }}</strong>
+          <strong>{{ authService.username() || 'Jogador' }}</strong>
         </div>
       </header>
 
@@ -22,7 +22,7 @@ import { AuthService } from '../../core/services/auth.service';
           <div class="brand-block">
             <p class="eyebrow">Puzzle arcade</p>
             <h1>Mastermind</h1>
-            <p>Leia o padrao, administre as tentativas e acompanhe cada partida.</p>
+            <p>Leia o padrão, administre as tentativas e se torne o "Mastermind!".</p>
           </div>
 
           <nav class="nav-links">
@@ -47,8 +47,8 @@ export class AppShellComponent {
   readonly menuOpen = signal(false);
   readonly navItems = [
     { path: '/app/play', label: 'Jogar' },
-    { path: '/app/rules', label: 'Rules' },
-    { path: '/app/history', label: 'Historico' },
+    { path: '/app/rules', label: 'Regras' },
+    { path: '/app/history', label: 'Histórico' },
     { path: '/app/ranking', label: 'Ranking' },
     { path: '/app/profile', label: 'Perfil' }
   ];

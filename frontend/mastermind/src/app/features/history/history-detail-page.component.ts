@@ -15,8 +15,8 @@ import { MastermindBoardComponent } from '../../shared/components/mastermind-boa
     <section class="page-stack">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Historico detalhado</p>
-          <h2>Replay da partida</h2>
+          <p class="eyebrow">Histórico detalhado</p>
+          <h2>Reprodução da partida</h2>
         </div>
         <button type="button" class="secondary-button" (click)="goBack()">Voltar</button>
       </div>
@@ -47,7 +47,7 @@ export class HistoryDetailPageComponent {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (board) => this.board.set(board),
-        error: (error) => this.error.set(formatApiError(error, 'Nao foi possivel abrir os detalhes da partida.'))
+        error: (error) => this.error.set(formatApiError(error, 'Não foi possível abrir os detalhes da partida.'))
       });
   }
 

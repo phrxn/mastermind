@@ -14,11 +14,8 @@ import { ApiSettingsPanelComponent } from '../../shared/components/api-settings-
   template: `
     <section class="auth-layout">
       <div class="hero-copy">
-        <p class="eyebrow">Mastermind online</p>
-        <h1>Entre na partida e continue de onde parou.</h1>
-        <p>
-          Login, retomada automatica de sessao e um tabuleiro pensado para celular primeiro.
-        </p>
+        <p class="eyebrow login-main-title">Mastermind online</p>
+        <h1>Entre e se torne o rei dos códigos!</h1>
       </div>
 
       <div class="auth-column">
@@ -26,14 +23,13 @@ import { ApiSettingsPanelComponent } from '../../shared/components/api-settings-
           <div class="section-heading">
             <div>
               <p class="eyebrow">Acesso</p>
-              <h2>Login</h2>
+              <h2>Entrar</h2>
             </div>
-            <span class="status-pill">JWT ready</span>
           </div>
 
           <label class="form-field">
-            <span>Usuario</span>
-            <input type="text" formControlName="username" autocomplete="username" placeholder="Seu usuario" />
+            <span>Usuário</span>
+            <input type="text" formControlName="username" autocomplete="username" placeholder="Seu usuário" />
           </label>
 
           <label class="form-field">
@@ -53,7 +49,7 @@ import { ApiSettingsPanelComponent } from '../../shared/components/api-settings-
           </div>
         </form>
 
-        <app-api-settings-panel title="Endereco da API" />
+        <app-api-settings-panel title="Endereço da API" />
       </div>
     </section>
   `
@@ -86,7 +82,7 @@ export class LoginPageComponent {
           void this.router.navigate(['/app/play']);
         },
         error: (error) => {
-          this.error.set(formatApiError(error, 'Nao foi possivel autenticar com a API.'));
+          this.error.set(formatApiError(error, 'Não foi possível autenticar com a API.'));
         }
       });
   }

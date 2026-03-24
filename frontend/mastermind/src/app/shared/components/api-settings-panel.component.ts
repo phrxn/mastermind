@@ -11,7 +11,7 @@ import { ApiSettingsService } from '../../core/services/api-settings.service';
     <section class="api-panel card-surface">
       <div class="section-heading compact">
         <div>
-          <p class="eyebrow">Conexao</p>
+          <p class="eyebrow">Conexão</p>
           <h3>{{ title() }}</h3>
         </div>
         <button type="button" class="ghost-button" (click)="toggle()">
@@ -21,7 +21,7 @@ import { ApiSettingsService } from '../../core/services/api-settings.service';
 
       @if (expanded()) {
         <label class="form-field">
-          <span>Endereco base da API</span>
+          <span>Endereço base da API</span>
           <input
             type="url"
             [(ngModel)]="draftBaseUrl"
@@ -31,7 +31,7 @@ import { ApiSettingsService } from '../../core/services/api-settings.service';
         </label>
 
         <div class="inline-actions">
-          <button type="button" class="secondary-button" (click)="save()">Salvar endereco</button>
+          <button type="button" class="secondary-button" (click)="save()">Salvar endereço</button>
         </div>
       } @else {
         <p class="api-url">{{ apiSettingsService.baseUrl() }}</p>

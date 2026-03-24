@@ -13,6 +13,6 @@ describe('RulesPageComponent', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('Como funciona o Mastermind');
-    expect(fixture.nativeElement.textContent).toContain('Objetivo');
+    expect(fixture.nativeElement.textContent).toContain('Regras por nível');
   });
 });

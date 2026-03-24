@@ -23,22 +23,31 @@ import { Component } from '@angular/core';
               <strong>Fácil, Normal, Difícil e Mastermind</strong>.
             </p>
 
-            <p>Ao começar, você verá o tabuleiro do jogo.</p>
-			<br /><br />
-			<img src="images/board_secret_example.png" alt="Exemplo do tabuleiro do jogo" />
+            <p class="next-paraph">
+              Ao começar, você verá no tabuleiro do jogo.
+            </p>
+            <p class="eyebrow">Segredo</p>
+            <img
+              src="images/board_secret_example.png"
+              alt="Exemplo do tabuleiro do jogo"
+            />
 
-            <p>
-              No topo do tabuleiro está o segredo a ser descoberto. E não
+            <p class="next-paraph">
+              No topo do tabuleiro está o segredo a ser descoberto. Ah! E não
               adianta tentar espiar — ele está bem protegido nos cofres do
               servidor. :)
             </p>
           </div>
-
+          <p class="eyebrow">Linha do tabuleiro</p>
+          <img
+            src="images/board_row_example.png"
+            alt="Exemplo de linha do tabuleiro"
+          />
           <div>
             <p>
-              Logo abaixo, há 10 linhas com 4 ou 6 espaços para cores. À direita
-              de cada linha, você verá pequenos quadrados que representam as
-              dicas.
+              Logo abaixo do segredo, há 10 linhas com 4 ou 6 espaços para
+              cores. À direita de cada linha, você verá pequenos quadrados que
+              representam as dicas.
             </p>
 
             <p>
@@ -47,14 +56,19 @@ import { Component } from '@angular/core';
               a dificuldade escolhida.
             </p>
 
-            <p>
-              Se quiser desfazer uma escolha, basta clicar na cor selecionada na
-              linha. Depois, clique no botão <strong>Tentar</strong>.
+            <p class="next-paraph">
+              <span style="text-decoration: underline;"
+                >Se quiser desfazer uma escolha</span
+              >, basta clicar na cor selecionada na linha. Depois, clique no
+              botão <strong>Tentar</strong>.
             </p>
           </div>
-
           <div>
             <p class="eyebrow">Dicas</p>
+            <img class="smooth-board"
+              src="images/board_tips_example.png"
+              alt="Exemplo de dicas do tabuleiro"
+            />
             <ul>
               <li>
                 <strong>Quadrado preto:</strong> indica que você acertou uma cor
@@ -76,13 +90,12 @@ import { Component } from '@angular/core';
           </div>
 
           <div>
-            <p>
-              Sua missão é usar lógica e dedução, com base nas tentativas e nas
-              dicas, para descobrir o segredo. Mas seja rápido: você tem apenas
-              <strong>10 tentativas</strong>!
+            <p class="next-paraph">
+              Sua missão é: baseado no histórico de tentivas e dicas tentar
+              adivinhas o segredo. Pense com cuidado, pois você só terá
+              <strong>10 tentativas</strong>! Boa sorte!
             </p>
           </div>
-
           <div>
             <p class="eyebrow">Regras por nível</p>
             <ul>

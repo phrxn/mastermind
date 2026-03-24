@@ -14,9 +14,9 @@ import { formatApiError } from '../../core/utils/mastermind.utils';
     <section class="auth-layout auth-layout-signup">
       <div class="hero-copy">
         <p class="eyebrow">Novo jogador</p>
-        <h1>Crie a conta e prepare a primeira combinacao.</h1>
+        <h1>Crie a conta e prepare a primeira combinação.</h1>
         <p>
-          Cadastro simples com os campos pedidos pela API e o mesmo visual do jogo para manter a navegacao coesa.
+          Cadastro simples com os campos pedidos pela API e o mesmo visual do jogo para manter a navegação coesa.
         </p>
       </div>
 
@@ -24,7 +24,7 @@ import { formatApiError } from '../../core/utils/mastermind.utils';
         <div class="section-heading">
           <div>
             <p class="eyebrow">Cadastro</p>
-            <h2>Signup</h2>
+            <h2>Criar conta</h2>
           </div>
         </div>
 
@@ -75,9 +75,9 @@ import { formatApiError } from '../../core/utils/mastermind.utils';
         <div class="dialog-backdrop" (click)="closeConfirmDialog()">
           <section class="dialog-panel card-surface" role="dialog" aria-modal="true" aria-label="Confirmar cadastro" (click)="$event.stopPropagation()">
             <div class="dialog-copy">
-              <p class="eyebrow">Confirmacao</p>
+              <p class="eyebrow">Confirmação</p>
               <h3>Confirmar cadastro</h3>
-              <p class="dialog-message">Revise os dados antes de enviar. Deseja criar este usuario agora?</p>
+              <p class="dialog-message">Revise os dados antes de enviar. Deseja criar este usuário agora?</p>
             </div>
 
             <div class="dialog-actions">
@@ -131,13 +131,13 @@ export class SignupPageComponent {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: () => {
-          this.success.set('Conta criada. Voce ja pode fazer login.');
+          this.success.set('Conta criada. Você já pode fazer login.');
           setTimeout(() => {
             void this.router.navigate(['/auth/login']);
           }, 900);
         },
         error: (error) => {
-          this.error.set(formatApiError(error, 'Nao foi possivel criar a conta.'));
+          this.error.set(formatApiError(error, 'Não foi possível criar a conta.'));
         }
       });
   }

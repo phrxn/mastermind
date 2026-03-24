@@ -16,13 +16,13 @@ import { MastermindBoardComponent } from '../../shared/components/mastermind-boa
       <div class="section-heading">
         <div>
           <p class="eyebrow">Ranking detalhado</p>
-          <h2>Replay da partida ranqueada</h2>
+          <h2>Reprodução da partida ranqueada</h2>
         </div>
         <button type="button" class="secondary-button" (click)="goBack()">Voltar</button>
       </div>
 
       @if (loading()) {
-        <section class="card-surface loading-card">Montando replay...</section>
+        <section class="card-surface loading-card">Montando reprodução...</section>
       } @else if (error()) {
         <section class="card-surface feedback error">{{ error() }}</section>
       } @else {
@@ -47,7 +47,7 @@ export class RankingDetailPageComponent {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (board) => this.board.set(board),
-        error: (error) => this.error.set(formatApiError(error, 'Nao foi possivel abrir a partida do ranking.'))
+        error: (error) => this.error.set(formatApiError(error, 'Não foi possível abrir a partida do ranking.'))
       });
   }
 

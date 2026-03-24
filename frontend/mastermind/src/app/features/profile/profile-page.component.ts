@@ -60,7 +60,7 @@ import { ApiSettingsPanelComponent } from '../../shared/components/api-settings-
             }
 
             <button type="submit" class="primary-button" [disabled]="savingProfile() || profileForm.invalid">
-              {{ savingProfile() ? 'Salvando...' : 'Salvar alteracoes' }}
+              {{ savingProfile() ? 'Salvando...' : 'Salvar alterações' }}
             </button>
           </form>
 
@@ -68,7 +68,7 @@ import { ApiSettingsPanelComponent } from '../../shared/components/api-settings-
             <form class="card-surface" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
               <div class="section-heading compact">
                 <div>
-                  <p class="eyebrow">Seguranca</p>
+                  <p class="eyebrow">Segurança</p>
                   <h3>Alterar senha</h3>
                 </div>
               </div>
@@ -133,7 +133,7 @@ export class ProfilePageComponent {
       .subscribe({
         next: (profile) => this.profileForm.reset(profile),
         error: () => {
-          this.profileFeedback.set('Nao foi possivel carregar o perfil.');
+          this.profileFeedback.set('Não foi possível carregar o perfil.');
           this.profileError.set(true);
         }
       });
@@ -161,7 +161,7 @@ export class ProfilePageComponent {
         },
         error: (error) => {
           this.profileError.set(true);
-          this.profileFeedback.set(formatApiError(error, 'Nao foi possivel atualizar o perfil.'));
+          this.profileFeedback.set(formatApiError(error, 'Não foi possível atualizar o perfil.'));
         }
       });
   }
@@ -176,7 +176,7 @@ export class ProfilePageComponent {
 
     if (newPassword !== confirmPassword) {
       this.passwordError.set(true);
-      this.passwordFeedback.set('A confirmacao da senha precisa ser igual a nova senha.');
+      this.passwordFeedback.set('A confirmação da senha precisa ser igual à nova senha.');
       return;
     }
 
@@ -194,7 +194,7 @@ export class ProfilePageComponent {
         },
         error: (error) => {
           this.passwordError.set(true);
-          this.passwordFeedback.set(formatApiError(error, 'Nao foi possivel alterar a senha.'));
+          this.passwordFeedback.set(formatApiError(error, 'Não foi possível alterar a senha.'));
         }
       });
   }

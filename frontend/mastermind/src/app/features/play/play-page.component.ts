@@ -1,7 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { finalize } from 'rxjs';
-import { GameBoardState, GameLevel, GuessRow } from '../../core/models/mastermind.models';
+import {
+  GameBoardState,
+  GameLevel,
+  GameStatus,
+  GuessRow,
+} from '../../core/models/mastermind.models';
 import { GameService } from '../../core/services/game.service';
 import {
   colorTokens,
@@ -10,7 +15,7 @@ import {
   levelOptions,
   nextGuessSelection,
   removeGuessSelection,
-  statusLabels
+  statusLabels,
 } from '../../core/utils/mastermind.utils';
 import { MastermindBoardComponent } from '../../shared/components/mastermind-board.component';
 
@@ -26,25 +31,32 @@ import { MastermindBoardComponent } from '../../shared/components/mastermind-boa
           <h2>Partida atual</h2>
         </div>
         @if (board()) {
-          <span class="status-pill">{{ statusLabels[board()!.status] }}</span>
+          <span class="status-pill" [ngClass]="statusClasses[board()!.status]" >{{ statusLabels[board()!.status] }}</span>
         }
       </div>
 
       @if (loading()) {
-        <section class="card-surface loading-card">Carregando tabuleiro...</section>
+        <section class="card-surface loading-card">
+          Carregando tabuleiro...
+        </section>
       } @else if (error()) {
         <section class="card-surface feedback error">{{ error() }}</section>
       } @else if (!board()) {
         <section class="card-surface empty-state">
           <h3>Nenhum jogo em andamento</h3>
-          <p>Escolha um nivel para montar o tabuleiro a partir da API.</p>
+          <p>Inicie uma partida e se desafie!</p>
         </section>
 
         <div class="level-grid">
           @for (option of levelOptions; track option.level) {
-            <button type="button" class="level-card card-surface" (click)="createGame(option.level)" [disabled]="loadingAction()">
+            <button
+              type="button"
+              class="level-card card-surface"
+              (click)="openConfirmDialog('start', option.level)"
+              [disabled]="loadingAction()"
+            >
               <p class="eyebrow">{{ option.label }}</p>
-              <strong>{{ option.columns }} casas</strong>
+              <strong>{{ option.columns }} cores</strong>
               <p>{{ option.description }}</p>
             </button>
           }
@@ -73,12 +85,14 @@ import { MastermindBoardComponent } from '../../shared/components/mastermind-boa
                 <strong>{{ board()!.numberOfColumnColors }}</strong>
               </li>
               <li>
-                <span>Tentativas maximas</span>
+                <span>Tentativas máximas</span>
                 <strong>{{ board()!.maximumOfAttempts }}</strong>
               </li>
               <li>
                 <span>Cores repetidas</span>
-                <strong>{{ board()!.repeatedColorAllowed ? 'Sim' : 'Nao' }}</strong>
+                <strong>{{
+                  board()!.repeatedColorAllowed ? 'Sim' : 'Não'
+                }}</strong>
               </li>
             </ul>
 
@@ -97,16 +111,34 @@ import { MastermindBoardComponent } from '../../shared/components/mastermind-boa
               </div>
 
               <div class="action-row">
-                <button type="button" class="primary-button" [disabled]="!canSubmitGuess() || loadingAction()" (click)="openConfirmDialog('submit')">
+                <button
+                  type="button"
+                  class="primary-button"
+                  [disabled]="!canSubmitGuess() || loadingAction()"
+                  (click)="openConfirmDialog('submit')"
+                >
                   {{ loadingAction() ? 'Enviando...' : 'Tentar' }}
                 </button>
-                <button type="button" class="danger-button" [disabled]="loadingAction()" (click)="openConfirmDialog('give-up')">
+                <button
+                  type="button"
+                  class="danger-button"
+                  [disabled]="loadingAction()"
+                  (click)="openConfirmDialog('give-up')"
+                >
                   Desistir
                 </button>
               </div>
             } @else {
-              <div class="feedback success">Partida encerrada. O segredo foi revelado no topo do tabuleiro.</div>
-              <button type="button" class="secondary-button full-width" (click)="backToMenu()">Voltar ao menu</button>
+              <div class="feedback success">
+                Partida encerrada. O segredo foi revelado no topo do tabuleiro.
+              </div>
+              <button
+                type="button"
+                class="secondary-button full-width"
+                (click)="backToMenu()"
+              >
+                Voltar ao menu
+              </button>
             }
           </section>
         </div>
@@ -114,24 +146,50 @@ import { MastermindBoardComponent } from '../../shared/components/mastermind-boa
 
       @if (confirmDialogOpen()) {
         <div class="dialog-backdrop" (click)="closeConfirmDialog()">
-          <section class="dialog-panel card-surface" role="dialog" aria-modal="true" [attr.aria-label]="confirmDialogTitle()" (click)="$event.stopPropagation()">
+          <section
+            class="dialog-panel card-surface"
+            role="dialog"
+            aria-modal="true"
+            [attr.aria-label]="confirmDialogTitle()"
+            (click)="$event.stopPropagation()"
+          >
             <div class="dialog-copy">
-              <p class="eyebrow">Confirmacao</p>
+              <p class="eyebrow">Confirmação</p>
               <h3>{{ confirmDialogTitle() }}</h3>
               <p class="dialog-message">{{ confirmDialogMessage() }}</p>
             </div>
 
             <div class="dialog-actions">
-              <button type="button" class="secondary-button" (click)="closeConfirmDialog()">Voltar</button>
-              <button type="button" class="primary-button" (click)="confirmDialogAction()">Confirmar</button>
+              <button
+                type="button"
+                class="secondary-button"
+                (click)="closeConfirmDialog()"
+              >
+                Voltar
+              </button>
+              <button
+                type="button"
+                class="primary-button"
+                (click)="confirmDialogAction()"
+              >
+                Confirmar
+              </button>
             </div>
           </section>
         </div>
       }
     </section>
-  `
+  `,
 })
 export class PlayPageComponent {
+
+  statusClasses: Record<GameStatus, string> = {
+    IN_PROGRESS: 'status-pill-in-progress',
+    WON: 'status-pill-won',
+    LOST: 'status-pill-lost',
+    GAVE_UP: 'status-pill-gave-up',
+  };
+
   private readonly gameService = inject(GameService);
 
   readonly board = signal<GameBoardState | null>(null);
@@ -147,9 +205,12 @@ export class PlayPageComponent {
   readonly levelLabels = levelLabels;
   readonly statusLabels = statusLabels;
   readonly canSubmitGuess = computed(
-    () => this.activeGuess().length === (this.board()?.numberOfColumnColors ?? Number.POSITIVE_INFINITY)
+    () =>
+      this.activeGuess().length ===
+      (this.board()?.numberOfColumnColors ?? Number.POSITIVE_INFINITY),
   );
-  private pendingConfirmAction: 'submit' | 'give-up' | null = null;
+  private pendingConfirmAction: 'start' | 'submit' | 'give-up' | null = null;
+  private pendingStartLevel: GameLevel | null = null;
 
   constructor() {
     this.loadCurrentGame();
@@ -168,8 +229,13 @@ export class PlayPageComponent {
           this.activeGuess.set([]);
         },
         error: (error) => {
-          this.error.set(formatApiError(error, 'Nao foi possivel consultar a partida atual.'));
-        }
+          this.error.set(
+            formatApiError(
+              error,
+              'Não foi possível consultar a partida atual.',
+            ),
+          );
+        },
       });
   }
 
@@ -186,8 +252,10 @@ export class PlayPageComponent {
           this.activeGuess.set([]);
         },
         error: (error) => {
-          this.error.set(formatApiError(error, 'Nao foi possivel criar a partida.'));
-        }
+          this.error.set(
+            formatApiError(error, 'Não foi possível criar a partida.'),
+          );
+        },
       });
   }
 
@@ -202,8 +270,8 @@ export class PlayPageComponent {
         this.activeGuess(),
         color,
         currentBoard.numberOfColumnColors,
-        currentBoard.repeatedColorAllowed
-      )
+        currentBoard.repeatedColorAllowed,
+      ),
     );
   }
 
@@ -220,8 +288,21 @@ export class PlayPageComponent {
     return false;
   }
 
-  openConfirmDialog(action: 'submit' | 'give-up'): void {
+  openConfirmDialog(action: 'start' | 'submit' | 'give-up', level?: GameLevel): void {
     const currentBoard = this.board();
+
+    if (action === 'start') {
+      if (!level) {
+        return;
+      }
+
+      this.pendingConfirmAction = 'start';
+      this.pendingStartLevel = level;
+      this.confirmDialogTitle.set('Iniciar partida');
+      this.confirmDialogMessage.set('Deseja realmente iniciar uma nova partida?');
+      this.confirmDialogOpen.set(true);
+      return;
+    }
 
     if (!currentBoard) {
       return;
@@ -231,12 +312,20 @@ export class PlayPageComponent {
       return;
     }
 
+    if (action === 'give-up' && currentBoard.rows.length === 0) {
+      this.giveUp();
+      return;
+    }
+
     this.pendingConfirmAction = action;
-    this.confirmDialogTitle.set(action === 'submit' ? 'Confirmar tentativa' : 'Confirmar desistencia');
+    this.pendingStartLevel = null;
+    this.confirmDialogTitle.set(
+      action === 'submit' ? 'Confirmar tentativa' : 'Confirmar desistência',
+    );
     this.confirmDialogMessage.set(
       action === 'submit'
         ? 'Deseja enviar essa tentativa agora?'
-        : 'Deseja realmente desistir da partida atual?'
+        : 'Deseja realmente desistir da partida atual?',
     );
     this.confirmDialogOpen.set(true);
   }
@@ -244,12 +333,22 @@ export class PlayPageComponent {
   closeConfirmDialog(): void {
     this.confirmDialogOpen.set(false);
     this.pendingConfirmAction = null;
+    this.pendingStartLevel = null;
   }
 
   confirmDialogAction(): void {
     const action = this.pendingConfirmAction;
     this.confirmDialogOpen.set(false);
     this.pendingConfirmAction = null;
+
+    if (action === 'start' && this.pendingStartLevel) {
+      const level = this.pendingStartLevel;
+      this.pendingStartLevel = null;
+      this.createGame(level);
+      return;
+    }
+
+    this.pendingStartLevel = null;
 
     if (action === 'submit') {
       this.submitGuess();
@@ -277,20 +376,27 @@ export class PlayPageComponent {
       .pipe(finalize(() => this.loadingAction.set(false)))
       .subscribe({
         next: (result) => {
-          const appendedRow = this.buildGuessRow(guess, result.tips, currentBoard.numberOfColumnColors, result.status);
+          const appendedRow = this.buildGuessRow(
+            guess,
+            result.tips,
+            currentBoard.numberOfColumnColors,
+            result.status,
+          );
           const nextRows = [...currentBoard.rows, appendedRow];
 
           this.board.set({
             ...currentBoard,
             rows: nextRows,
             status: result.status,
-            secret: result.secret ?? currentBoard.secret
+            secret: result.secret ?? currentBoard.secret,
           });
           this.activeGuess.set([]);
         },
         error: (error) => {
-          this.error.set(formatApiError(error, 'Nao foi possivel enviar a tentativa.'));
-        }
+          this.error.set(
+            formatApiError(error, 'Não foi possível enviar a tentativa.'),
+          );
+        },
       });
   }
 
@@ -310,13 +416,15 @@ export class PlayPageComponent {
           this.board.update((currentBoard) => ({
             ...(currentBoard ?? board),
             ...board,
-            rows: currentBoard?.rows ?? board.rows
+            rows: currentBoard?.rows ?? board.rows,
           }));
           this.activeGuess.set([]);
         },
         error: (error) => {
-          this.error.set(formatApiError(error, 'Nao foi possivel desistir da partida.'));
-        }
+          this.error.set(
+            formatApiError(error, 'Não foi possível desistir da partida.'),
+          );
+        },
       });
   }
 
@@ -326,7 +434,12 @@ export class PlayPageComponent {
     this.error.set('');
   }
 
-  private buildGuessRow(guess: number[], tips: GuessRow['tips'] | undefined, total: number, status: GameBoardState['status']): GuessRow {
+  private buildGuessRow(
+    guess: number[],
+    tips: GuessRow['tips'] | undefined,
+    total: number,
+    status: GameBoardState['status'],
+  ): GuessRow {
     if (tips) {
       return { guess, tips };
     }
@@ -334,13 +447,13 @@ export class PlayPageComponent {
     if (status === 'WON') {
       return {
         guess,
-        tips: { correctPositions: total, correctColors: 0 }
+        tips: { correctPositions: total, correctColors: 0 },
       };
     }
 
     return {
       guess,
-      tips: { correctPositions: 0, correctColors: 0 }
+      tips: { correctPositions: 0, correctColors: 0 },
     };
   }
 }

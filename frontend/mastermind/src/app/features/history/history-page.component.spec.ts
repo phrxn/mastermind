@@ -45,13 +45,13 @@ describe('HistoryPageComponent', () => {
     const fixture = TestBed.createComponent(HistoryPageComponent);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain('Pagina 1 de 2');
+    expect(fixture.nativeElement.textContent).toContain('Página 1 de 2');
 
     const nextButton = Array.from(fixture.nativeElement.querySelectorAll('.pagination-bar button'))[1] as HTMLButtonElement;
     nextButton.click();
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain('Pagina 2 de 2');
+    expect(fixture.nativeElement.textContent).toContain('Página 2 de 2');
 
     const historyCard = fixture.nativeElement.querySelector('.history-card') as HTMLButtonElement;
     historyCard.click();
