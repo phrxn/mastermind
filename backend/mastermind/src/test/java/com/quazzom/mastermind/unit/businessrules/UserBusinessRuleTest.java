@@ -129,7 +129,7 @@ class UserBusinessRuleTest {
 	void setEmailShouldFailWhenEmailHasNoAtSymbol() {
 		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
 				() -> userBusinessRule.setEmail("mariateste.com"));
-		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)",
+		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e outro domínio)",
 				exception.getMessage());
 	}
 
@@ -137,7 +137,7 @@ class UserBusinessRuleTest {
 	void setEmailShouldFailWhenEmailHasNoDotAfterAt() {
 		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
 				() -> userBusinessRule.setEmail("maria@testecom"));
-		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)",
+		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e outro domínio)",
 				exception.getMessage());
 	}
 
@@ -145,7 +145,7 @@ class UserBusinessRuleTest {
 	void setEmailShouldFailWhenEmailEndsWithDot() {
 		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
 				() -> userBusinessRule.setEmail("maria@testecom."));
-		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)",
+		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e outro domínio)",
 				exception.getMessage());
 	}
 

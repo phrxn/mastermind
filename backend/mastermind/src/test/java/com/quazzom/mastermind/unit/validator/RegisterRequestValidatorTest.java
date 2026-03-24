@@ -110,7 +110,7 @@ class RegisterRequestValidatorTest {
 
 		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
 				() -> userValidator.validateRequestBody(request));
-		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)", exception.getMessage());
+		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e outro domínio)", exception.getMessage());
 	}
 
 	@Test
@@ -120,7 +120,7 @@ class RegisterRequestValidatorTest {
 
 		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
 				() -> userValidator.validateRequestBody(request));
-		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)", exception.getMessage());
+		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e outro domínio)", exception.getMessage());
 	}
 
 	@Test
@@ -130,7 +130,7 @@ class RegisterRequestValidatorTest {
 
 		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
 				() -> userValidator.validateRequestBody(request));
-		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)", exception.getMessage());
+		assertEquals("O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e outro domínio)", exception.getMessage());
 	}
 
 	@Test

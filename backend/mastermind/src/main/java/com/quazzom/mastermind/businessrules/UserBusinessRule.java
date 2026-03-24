@@ -75,7 +75,7 @@ public class UserBusinessRule extends User {
 
 		if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{1,}$")) {
 			throw new RequestInvalidPropertyValueException(
-					"O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e TLD)");
+					"O email deve seguir o formato mínimo: a@a.a (deve ter um usuário, arroba, domínio, ponto e outro domínio)");
 		}
 
 		super.setEmail(email);
