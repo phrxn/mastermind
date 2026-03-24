@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
+import { AuthService } from '../../core/services/auth.service';
 import { ProfileService } from '../../core/services/profile.service';
 import { formatApiError } from '../../core/utils/mastermind.utils';
 import { ApiSettingsPanelComponent } from '../../shared/components/api-settings-panel.component';
@@ -105,6 +106,7 @@ import { ApiSettingsPanelComponent } from '../../shared/components/api-settings-
   `
 })
 export class ProfilePageComponent {
+  private readonly authService = inject(AuthService);
   private readonly profileService = inject(ProfileService);
 
   readonly loading = signal(true);
@@ -156,6 +158,7 @@ export class ProfilePageComponent {
       .subscribe({
         next: (profile) => {
           this.profileForm.reset(profile);
+          this.authService.updateUsername(nickname);
           this.profileError.set(false);
           this.profileFeedback.set('Perfil atualizado com sucesso.');
         },

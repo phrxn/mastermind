@@ -19,7 +19,7 @@ export class AuthService {
   readonly token = computed(() => this.sessionState()?.token ?? null);
   readonly tokenType = computed(() => this.sessionState()?.tokenType ?? 'Bearer');
   readonly isAuthenticated = computed(() => Boolean(this.sessionState()?.token));
-  readonly username = computed(() => this.sessionState()?.username ?? '');
+  readonly username = computed(() => this.sessionState()?.displayName ?? this.sessionState()?.username ?? '');
 
   login(credentials: LoginRequest): Observable<void> {
     return this.rawHttp
@@ -30,6 +30,7 @@ export class AuthService {
             token: response.token,
             tokenType: response.tokenType || 'Bearer',
             username: credentials.username,
+            displayName: credentials.username,
             password: credentials.password
           });
         }),
@@ -39,6 +40,20 @@ export class AuthService {
 
   signup(payload: SignupRequest): Observable<void> {
     return this.rawHttp.post(this.buildUrl('auth/register'), payload).pipe(map(() => void 0));
+  }
+
+  updateUsername(username: string): void {
+    const session = this.sessionState();
+    const normalizedUsername = username.trim();
+
+    if (!session || !normalizedUsername) {
+      return;
+    }
+
+    this.persistSession({
+      ...session,
+      displayName: normalizedUsername
+    });
   }
 
   refreshSession(): Observable<string> {
@@ -62,6 +77,7 @@ export class AuthService {
           token: response.token,
           tokenType: response.tokenType || session.tokenType,
           username: session.username,
+          displayName: session.displayName ?? session.username,
           password: session.password
         })),
         tap((newSession) => this.persistSession(newSession)),

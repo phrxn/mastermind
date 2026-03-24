@@ -108,5 +108,6 @@ export interface AuthSession {
   token: string;
   tokenType: string;
   username: string;
+  displayName?: string;
   password: string;
 }
