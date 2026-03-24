@@ -154,9 +154,15 @@ public class GameService {
 
         List<Integer> secret = getSecretInMemory(game);
 
-        game.setStatus(GameStatus.GAVE_UP);
-        game.setFinishedAt(LocalDateTime.now());
-        gameRepository.save(game);
+        if (game.getAttemptsUsed() > 0) {
+            game.setStatus(GameStatus.GAVE_UP);
+            game.setFinishedAt(LocalDateTime.now());
+            gameRepository.save(game);
+        } else {
+			// If the user gives up without making any attempts, we can consider it as if the game never started.
+			// In this case, we can delete the game record instead of marking it as GAVE_UP.
+			gameRepository.delete(game);
+		}
         inMemorySecretsByGameId.remove(game.getId());
 
         return new GameEndResponse(GameStatus.GAVE_UP, game.getLevel(), secret);

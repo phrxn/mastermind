@@ -17,6 +17,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -265,6 +266,7 @@ class GameServiceTest {
 	// ===== giveUp =====
 	@Test
 	void giveUpShouldEndGameWithGaveUpStatus() {
+		inProgressGame.setAttemptsUsed(3);
 		when(secretDecoder.decode("1,2,3,4")).thenReturn(List.of(1, 2, 3, 4));
 		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
@@ -279,6 +281,23 @@ class GameServiceTest {
 		assertEquals(GameStatus.GAVE_UP, inProgressGame.getStatus());
 		assertNotNull(inProgressGame.getFinishedAt());
 		verify(gameRepository).save(inProgressGame);
+		verify(gameRepository, never()).delete(any(Game.class));
+	}
+
+	@Test
+	void giveUpShouldDeleteGameWhenNoAttemptsUsed() {
+		when(secretDecoder.decode("1,2,3,4")).thenReturn(List.of(1, 2, 3, 4));
+		when(userRepository.findById(10L)).thenReturn(Optional.of(user));
+		when(gameRepository.findFirstByUserIdAndStatusOrderByCreatedAtDesc(10L, GameStatus.IN_PROGRESS))
+				.thenReturn(Optional.of(inProgressGame));
+
+		GameEndResponse response = gameService.giveUp(10L);
+
+		assertEquals(GameStatus.GAVE_UP, response.status());
+		assertEquals(GameLevel.EASY, response.gameLevel());
+		assertEquals(List.of(1, 2, 3, 4), response.secret());
+		verify(gameRepository).delete(inProgressGame);
+		verify(gameRepository, never()).save(any(Game.class));
 	}
 
 	@Test
