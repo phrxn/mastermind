@@ -113,7 +113,7 @@ export class HistoryPageComponent {
   readonly error = signal('');
   readonly history = signal<HistoryResponse | null>(null);
   readonly pageIndex = signal(0);
-  readonly pageSize = 10;
+  readonly pageSize = 12;
   readonly levelOptions = levelOptions;
   readonly levelLabels = levelLabels;
   readonly statusLabels = statusLabels;
