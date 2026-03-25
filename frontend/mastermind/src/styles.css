@@ -1,7 +1,9 @@
 
 :root {
   color-scheme: dark;
-  --site-max-width: 900px;
+  --site-max-width: 1024px;
+  --font-body: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Trebuchet MS", "Arial Narrow", "Segoe UI", Arial, sans-serif;
   --bg: #080b10;
   --bg-soft: rgba(12, 18, 27, 0.82);
   --surface: rgba(16, 21, 31, 0.84);
@@ -40,7 +42,7 @@ body {
 }
 
 body {
-  font-family: "Manrope", sans-serif;
+  font-family: var(--font-body);
   color: var(--text);
   background:
     radial-gradient(
@@ -97,7 +99,7 @@ h1,
 h2,
 h3 {
   margin: 0;
-  font-family: "Oxanium", sans-serif;
+  font-family: var(--font-display);
   letter-spacing: 0.02em;
 }
 
@@ -607,7 +609,7 @@ p {
   place-items: center;
   border-radius: 1rem;
   background: rgba(15, 23, 42, 0.06);
-  font-family: "Oxanium", sans-serif;
+  font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 800;
   color: var(--accent-dark);
@@ -935,7 +937,7 @@ img.smooth-board {
   flex-wrap: wrap;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1024px) {
   .auth-layout,
   .app-shell {
     max-width: var(--site-max-width);
