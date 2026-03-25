@@ -29,7 +29,7 @@ import { ApiSettingsPanelComponent } from '../../shared/components/api-settings-
 
           <label class="form-field">
             <span>Usuário</span>
-            <input type="text" formControlName="username" autocomplete="username" placeholder="Seu usuário" />
+            <input type="text" formControlName="username" autocomplete="username" placeholder="Nickname ou e-mail" />
           </label>
 
           <label class="form-field">
