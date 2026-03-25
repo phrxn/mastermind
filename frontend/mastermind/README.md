@@ -1,59 +1,53 @@
 # Mastermind
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.22.
+Este repositório contém o website (SPA) do projeto **Mastermind**.
 
-## Development server
+// imagem
 
-To start a local development server, run:
 
-```bash
-ng serve
-```
+A solução foi desenvolvida utilizando Angular na versão 19. Optei por essa versão por ser relativamente recente e estável, considerando que o Angular passa por mudanças frequentes entre releases, o que pode impactar significativamente suas características e funcionamento.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Tecnologias utilizadas
 
-## Code scaffolding
+- HTML
+- CSS
+- Typescript
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Outros
+---
+- NodeJs Versão 22.22 *1
+- Angular CLI Versão 21.2.2 *2
+- npm Versão 10.9.4
 
-```bash
-ng generate component component-name
-```
+**1* Essa versão foi escolhida, pois além de recente é compátivel com com o Angular CLI (que às vezes reclama ou dá conflito com a versão do Node.js<br>
+**2* Embora a versão do Angular CLI ser a 21, o projeto foi desenvolvido usando a versão 19
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
 
-```bash
-ng generate --help
-```
+# Execução rápida
 
-## Building
+## Ferramentas necessárias
 
-To build the project run:
+- NodeJs Versão 22.22
+- Angular CLI 21.2.2
 
-```bash
-ng build
-```
+1) Com o Node.js instalado na sua máquina. Abra um terminal (Bash - Linux ou Git bash - Windows)
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+2) Vamos instalar o NodeJs versão 22.22. Digite no terminal ``nvm install 22.22``
 
-## Running unit tests
+3) Vamos ativar o uso dessa versão do NodeJs ``nvm use  22.22``. Não se preocupe, a versão padrão do seu Angular não vai mudar, somente durante a execução desse terminal ela vai ser a 22.22
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+4) Com o Node.js versão 22.22 instalado execute a instalação do Angular CLI: ``npm install -g @angular/cli``. Atenção com o -g! Ele irá installar o Angular CLI no repositorio Global do Node. Se não quiser isso, remova o parâmetro -g.
 
-```bash
-ng test
-```
+5) Verifique a versão do Angular ``ng version``
 
-## Running end-to-end tests
+6) Execute o comando ``npm install`` para instalar as depêndencias do projeto
 
-For end-to-end (e2e) testing, run:
+7) Para visualizar o site execute ``ng serve``, o website site está disponível na porta 4200. para acessá-lo entre:
+http://localhost:4200
 
-```bash
-ng e2e
-```
+> [!NOTE]
+> Para o site funcionar 100% é preciso que a API + o Banco de dados já estejam no Ar. Para facilitar quaisquer ajuste de conexão com o API, uma tela que permite você alterar o endereço da API foi coloca na tela de Login e dentro do Perfil
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+![API change menu](https://github.com/phrxn/phrxn/blob/master/mastermind/website/api_change_address_example.png)
 
-## Additional Resources
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

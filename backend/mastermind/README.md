@@ -69,6 +69,8 @@ As respostas de erro seguem um padrão estruturado:
 
 # Execução rápida
 
+**Somente será necessária, se você não utilzar o docker**
+
 ## Ferramentas necessárias
 
 - JDK versão 21
