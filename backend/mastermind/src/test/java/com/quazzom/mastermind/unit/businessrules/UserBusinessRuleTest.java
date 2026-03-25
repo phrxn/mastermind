@@ -43,6 +43,20 @@ class UserBusinessRuleTest {
 	}
 
 	@Test
+	void setNameShouldFailWhenNameStartsWithWhitespace() {
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userBusinessRule.setName(" Maria Silva"));
+		assertEquals("O nome não pode começar ou terminar com espaços", exception.getMessage());
+	}
+
+	@Test
+	void setNameShouldFailWhenNameEndsWithWhitespace() {
+		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
+				() -> userBusinessRule.setName("Maria Silva "));
+		assertEquals("O nome não pode começar ou terminar com espaços", exception.getMessage());
+	}
+
+	@Test
 	void setNameShouldFailWhenNameContainsNumber() {
 		RequestInvalidPropertyValueException exception = assertThrows(RequestInvalidPropertyValueException.class,
 				() -> userBusinessRule.setName("Maria1 Silva"));

@@ -151,9 +151,10 @@ export class ProfilePageComponent {
     this.profileFeedback.set('');
 
     const { age, name, nickname } = this.profileForm.getRawValue();
+    const trimmedName = name.trim();
 
     this.profileService
-      .updateProfile({ age, name, nickname })
+      .updateProfile({ age, name: trimmedName, nickname })
       .pipe(finalize(() => this.savingProfile.set(false)))
       .subscribe({
         next: (profile) => {

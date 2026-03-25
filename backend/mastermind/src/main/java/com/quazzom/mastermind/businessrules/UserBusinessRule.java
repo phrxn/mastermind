@@ -48,7 +48,10 @@ public class UserBusinessRule extends User {
 					messageDefaultForPropertiesJSON.createMessageForPropertyThatDoesNotExist("name"));
 		}
 
-		name = name.trim();
+		if (name.startsWith(" ") || name.endsWith(" ")) {
+			throw new RequestInvalidPropertyValueException(
+					"O nome não pode começar ou terminar com espaços");
+		}
 
 		if (!name.matches("^[A-Za-z ]{1,60}$")) {
 			throw new RequestInvalidPropertyValueException(
