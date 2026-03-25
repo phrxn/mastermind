@@ -48,6 +48,8 @@ public class UserBusinessRule extends User {
 					messageDefaultForPropertiesJSON.createMessageForPropertyThatDoesNotExist("name"));
 		}
 
+		name = name.trim();
+
 		if (!name.matches("^[A-Za-z ]{1,60}$")) {
 			throw new RequestInvalidPropertyValueException(
 					"O nome deve conter apenas letras e espaços, com no máximo 60 caracteres");
