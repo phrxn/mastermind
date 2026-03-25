@@ -60,3 +60,12 @@ Para executar sem o Docker será preciso subir cada ambiente manualmente.
 
 ![Docker schema](https://raw.githubusercontent.com/phrxn/phrxn/refs/heads/master/mastermind/docker_schema.png)
 
+# PASTAS
+
+| Caminho                | Descrição                        |
+|------------------------|----------------------------------|
+| backend/mastermind     | Backend do project API          |
+| frontend/mastermind    | Front-end Angular               |
+| infra/database         | Arquivo SQL para criar o banco  |
+| collections            | Arquivo de Collection do Postman para testar a API (**Atenção dentro do repositório do backend há um tutorial explicando o uso do Swagger**)|
+| images                 | Imagens do Website funcionando  |

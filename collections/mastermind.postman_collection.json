@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"xxxx\",\n  \"password\" : \"123@Abc\",\n  \"email\" : \"x@x.x\",\n  \"age\" : 30,\n  \"nickname\": \"xxxx\"\n}",
+							"raw": "{\n  \"name\": \"xxxx\",\n  \"password\" : \"xxxxx\",\n  \"email\" : \"x@x.x\",\n  \"age\" : 30,\n  \"nickname\": \"xxxx\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -34,7 +34,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\" : \"xxxx\",\n  \"password\" : \"123@Abc\"\n}",
+							"raw": "{\n  \"username\" : \"xxxx\",\n  \"password\" : \"xxxxx\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -248,7 +248,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"currentPassword\" : \"123@Abcx\",\n    \"newPassword\": \"123@Abc\"\n}",
+							"raw": "{\n    \"currentPassword\" : \"xxxxx\",\n    \"newPassword\": \"xxxxx\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"

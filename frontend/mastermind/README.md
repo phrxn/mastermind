@@ -2,8 +2,7 @@
 
 Este repositório contém o website (SPA) do projeto **Mastermind**.
 
-// imagem
-
+(Veja a pasta images) na raiz desse repositório
 
 A solução foi desenvolvida utilizando Angular na versão 19. Optei por essa versão por ser relativamente recente e estável, considerando que o Angular passa por mudanças frequentes entre releases, o que pode impactar significativamente suas características e funcionamento.
 
