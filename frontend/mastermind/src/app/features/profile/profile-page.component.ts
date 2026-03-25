@@ -124,8 +124,8 @@ export class ProfilePageComponent {
   });
   readonly passwordForm = new FormGroup({
     currentPassword: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    newPassword: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(6)] }),
-    confirmPassword: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(6)] })
+    newPassword: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(0)] }),
+    confirmPassword: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(0)] })
   });
 
   constructor() {

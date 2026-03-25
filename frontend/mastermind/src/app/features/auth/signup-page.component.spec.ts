@@ -1,12 +1,11 @@
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { SignupPageComponent } from './signup-page.component';
 
 describe('SignupPageComponent', () => {
   let authService: jasmine.SpyObj<AuthService>;
-  let router: Router;
 
   beforeEach(async () => {
     authService = jasmine.createSpyObj<AuthService>('AuthService', ['signup']);
@@ -18,9 +17,6 @@ describe('SignupPageComponent', () => {
         { provide: AuthService, useValue: authService },
       ]
     }).compileComponents();
-
-    router = TestBed.inject(Router);
-    spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
   });
 
   it('should open a confirmation dialog before sending the signup request', () => {
@@ -33,7 +29,8 @@ describe('SignupPageComponent', () => {
       email: 'player@example.com',
       nickname: 'player1',
       age: 24,
-      password: '123456'
+      password: '123456',
+      confirmPassword: '123456'
     });
     fixture.detectChanges();
 
@@ -46,7 +43,7 @@ describe('SignupPageComponent', () => {
     expect(fixture.nativeElement.querySelector('.dialog-panel')).not.toBeNull();
   });
 
-  it('should submit after confirmation and redirect to login', fakeAsync(() => {
+  it('should submit after confirmation and stay on the signup page', () => {
     authService.signup.and.returnValue(of(void 0));
     const fixture = TestBed.createComponent(SignupPageComponent);
     const component = fixture.componentInstance;
@@ -56,7 +53,8 @@ describe('SignupPageComponent', () => {
       email: 'player@example.com',
       nickname: 'player1',
       age: 24,
-      password: '123456'
+      password: '123456',
+      confirmPassword: '123456'
     });
     component.openConfirmDialog();
     fixture.detectChanges();
@@ -64,7 +62,6 @@ describe('SignupPageComponent', () => {
     const confirmButton = Array.from(fixture.nativeElement.querySelectorAll('.dialog-panel button'))[1] as HTMLButtonElement;
     confirmButton.click();
     fixture.detectChanges();
-    tick(900);
 
     expect(authService.signup).toHaveBeenCalledWith({
       name: 'Player One',
@@ -73,7 +70,26 @@ describe('SignupPageComponent', () => {
       age: 24,
       password: '123456'
     });
-    expect(component.success()).toContain('Você já pode fazer login');
-    expect(router.navigate).toHaveBeenCalledWith(['/auth/login']);
-  }));
+    expect(component.success()).toContain('Conta criada com sucesso');
+  });
+
+  it('should keep the form invalid when password confirmation does not match', () => {
+    const fixture = TestBed.createComponent(SignupPageComponent);
+    const component = fixture.componentInstance;
+
+    component.form.setValue({
+      name: 'Player One',
+      email: 'player@example.com',
+      nickname: 'player1',
+      age: 24,
+      password: '123456',
+      confirmPassword: '654321'
+    });
+    component.openConfirmDialog();
+    fixture.detectChanges();
+
+    expect(component.form.hasError('passwordMismatch')).toBeTrue();
+    expect(component.confirmDialogOpen()).toBeFalse();
+    expect(authService.signup).not.toHaveBeenCalled();
+  });
 });

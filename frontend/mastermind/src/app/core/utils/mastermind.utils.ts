@@ -192,12 +192,26 @@ export function formatApiError(error: unknown, fallback = 'Não foi possível co
     return fallback;
   }
 
-  const maybeMessage = (error as { error?: { error?: string }; message?: string }).error?.error;
+  const httpLikeError = error as {
+    status?: number;
+    message?: string;
+    error?: { error?: string; message?: string };
+  };
+
+  if (httpLikeError.status === 0) {
+    return 'Não foi possível conectar com a API. Verifique o endereço configurado e tente novamente.';
+  }
+
+  const maybeMessage = httpLikeError.error?.error ?? httpLikeError.error?.message;
   if (maybeMessage) {
     return maybeMessage;
   }
 
-  return (error as { message?: string }).message ?? fallback;
+  if (typeof httpLikeError.message === 'string' && httpLikeError.message.includes('Unknown Error')) {
+    return 'Não foi possível conectar com a API. Verifique o endereço configurado e tente novamente.';
+  }
+
+  return httpLikeError.message ?? fallback;
 }
 
 export function joinUrl(baseUrl: string, path: string): string {

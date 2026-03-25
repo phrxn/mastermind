@@ -46,7 +46,7 @@ type RankingTab = 'easy' | 'normal' | 'hard' | 'mastermind';
 
         @if (currentItems().length === 0) {
           <section class="card-surface empty-state">
-            Ainda não existem partidas ranqueadas nessa faixa.
+            Ainda não existem partidas ranqueadas nesse nível.
           </section>
         } @else {
           <div class="ranking-list" aria-label="Ranking atual">

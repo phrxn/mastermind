@@ -1,10 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { formatApiError } from '../../core/utils/mastermind.utils';
+
+const passwordMatchValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const password = control.get('password')?.value;
+  const confirmPassword = control.get('confirmPassword')?.value;
+
+  if (!password || !confirmPassword) {
+    return null;
+  }
+
+  return password === confirmPassword ? null : { passwordMismatch: true };
+};
 
 @Component({
   selector: 'app-signup-page',
@@ -50,6 +61,15 @@ import { formatApiError } from '../../core/utils/mastermind.utils';
           <input type="password" formControlName="password" autocomplete="new-password" />
         </label>
 
+        <label class="form-field">
+          <span>Confirmar senha</span>
+          <input type="password" formControlName="confirmPassword" autocomplete="new-password" />
+        </label>
+
+        @if (form.hasError('passwordMismatch') && form.touched) {
+          <p class="feedback error">A confirmação da senha precisa ser igual à senha informada.</p>
+        }
+
         @if (error()) {
           <p class="feedback error">{{ error() }}</p>
         }
@@ -87,19 +107,22 @@ import { formatApiError } from '../../core/utils/mastermind.utils';
 })
 export class SignupPageComponent {
   private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
 
   readonly loading = signal(false);
   readonly error = signal('');
   readonly success = signal('');
   readonly confirmDialogOpen = signal(false);
-  readonly form = new FormGroup({
-    name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
-    nickname: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    age: new FormControl(18, { nonNullable: true, validators: [Validators.required, Validators.min(1)] }),
-    password: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(1)] })
-  });
+  readonly form = new FormGroup(
+    {
+      name: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+      email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
+      nickname: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+      age: new FormControl(18, { nonNullable: true, validators: [Validators.required, Validators.min(1)] }),
+      password: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(1)] }),
+      confirmPassword: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(1)] })
+    },
+    { validators: [passwordMatchValidator] }
+  );
 
   openConfirmDialog(): void {
     if (this.form.invalid) {
@@ -122,18 +145,28 @@ export class SignupPageComponent {
     this.loading.set(true);
 
     this.authService
-      .signup(this.form.getRawValue())
+      .signup(this.buildSignupPayload())
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: () => {
-          this.success.set('Conta criada. Você já pode fazer login.');
-          setTimeout(() => {
-            void this.router.navigate(['/auth/login']);
-          }, 900);
+          this.form.reset({
+            name: '',
+            email: '',
+            nickname: '',
+            age: 18,
+            password: '',
+            confirmPassword: ''
+          });
+          this.success.set('Conta criada com sucesso. Agora você pode entrar quando quiser.');
         },
         error: (error) => {
           this.error.set(formatApiError(error, 'Não foi possível criar a conta.'));
         }
       });
+  }
+
+  private buildSignupPayload() {
+    const { confirmPassword: _, ...payload } = this.form.getRawValue();
+    return payload;
   }
 }

@@ -1,5 +1,6 @@
 import {
   buildTipsGrid,
+  formatApiError,
   nextGuessSelection,
   normalizeBoardState,
   normalizeHistoryResponse,
@@ -64,5 +65,14 @@ describe('mastermind utils', () => {
     expect(result.top10EasyGames).toHaveSize(1);
     expect(result.top10EasyGames[0].gameLevel).toBe('EASY');
     expect(result.top10EasyGames[0].userNickname).toBe('Ace');
+  });
+
+  it('should return a friendly message when the API cannot be reached', () => {
+    expect(
+      formatApiError({
+        status: 0,
+        message: 'Http failure response for http://localhost:8080/api/v1z/game/status: 0 Unknown Error'
+      })
+    ).toBe('Não foi possível conectar com a API. Verifique o endereço configurado e tente novamente.');
   });
 });
