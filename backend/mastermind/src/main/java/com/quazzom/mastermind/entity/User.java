@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.hibernate.annotations.Generated;
-import org.hibernate.generator.EventType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -17,6 +17,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 
@@ -29,8 +30,8 @@ public class User {
     private Long id;
 
 
-	@Generated(event = EventType.INSERT)
-    @Column(name = "uuid_public", insertable = false, updatable = false, nullable = false, unique = true)
+	@Column(name = "uuid_public", nullable = false, unique = true, length = 36)
+	@JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID uuidPublic;
 	private String name;
 	private String email;
@@ -125,6 +126,13 @@ public class User {
 
 	public void setGames(List<Game> games) {
 		this.games = games;
+	}
+
+	@PrePersist
+	private void prePersist() {
+		if (uuidPublic == null) {
+			uuidPublic = UUID.randomUUID();
+		}
 	}
 
 }
