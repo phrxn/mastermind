@@ -14,13 +14,13 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
                         url = "https://linkedin.com/in/phrxn"
                 ),
                 title = "Mastermind API",
-                description = "API for the Mastermind game. This API provides a way for you to play, view your history, edit your profile, and see the Global Ranking!",
+                description = "API para o jogo Mastermind. Esta API permite que você jogue, veja seu histórico, edite seu perfil e confira o Ranking Global!",
                 version = "1.0.0"
         )
 )
 @SecurityScheme(
 		name = "bearerAuth",
-		description = "The token can be obtained at /api/v1/auth/login. To log in, you must first register at /api/v1/auth/register.",
+		description = "O token pode ser obtido em /api/v1/auth/login. Para fazer login, você deve primeiro se registrar em /api/v1/auth/register.",
 		type = SecuritySchemeType.HTTP,
 		scheme = "bearer",
 		bearerFormat="JWT",

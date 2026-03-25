@@ -40,7 +40,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(
-            description = "Autenticar um usuário existente com nickname/e-mail e senha. Retorna o token JWT necessário para usar a API",
+            description = "Registra um novo usuário para utilizar a API.",
             responses = {
                 @ApiResponse(
                         responseCode = "400",
@@ -74,7 +74,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(
-            description = "Autenticar um usuário existente com nickname/e-mail e senha. Retorna o token JWT necessário para usar a API",
+            description = "Autentica um usuário existente com nickname/e-mail e senha. Retorna o token JWT necessário para usar a API",
             responses = {
                 @ApiResponse(
                         responseCode = "400",
@@ -105,7 +105,7 @@ public class AuthController {
     @GetMapping("/me")
     @SecurityRequirement(name = "bearerAuth")
     @Operation(
-            description = "Autenticar um usuário existente com nickname/e-mail e senha. Retorna o token JWT necessário para usar a API",
+            description = "Checa o token JWT enviado no header Authorization e retorna informações sobre o usuário autenticado.",
             responses = {
                 @ApiResponse(
                         responseCode = "401",
