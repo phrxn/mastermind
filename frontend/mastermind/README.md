@@ -2,7 +2,9 @@
 
 Este repositório contém o website (SPA) do projeto **Mastermind**.
 
-(Veja a pasta images) na raiz desse repositório
+(Veja a pasta images) na raiz desse repositório para ver imagens
+
+Ou baixo o vídeo para ver mais detalhes:      ![Video Showroom](https://github.com/phrxn/phrxn/blob/master/mastermind/website_showroom.mp4)
 
 A solução foi desenvolvida utilizando Angular na versão 19. Optei por essa versão por ser relativamente recente e estável, considerando que o Angular passa por mudanças frequentes entre releases, o que pode impactar significativamente suas características e funcionamento.
 
