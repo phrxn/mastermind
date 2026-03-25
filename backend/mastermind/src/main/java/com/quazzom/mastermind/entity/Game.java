@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.hibernate.annotations.Generated;
-import org.hibernate.generator.EventType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -19,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -29,8 +30,8 @@ public class Game {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Generated(event = EventType.INSERT)
-    @Column(name = "uuid_public", insertable = false, updatable = false, nullable = false, unique = true)
+	@Column(name = "uuid_public", nullable = false, unique = true, length = 36)
+	@JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID uuidPublic;
 
 	@ManyToOne
@@ -148,6 +149,13 @@ public class Game {
 
 	public void setGuesses(List<Guess> guesses) {
 		this.guesses = guesses;
+	}
+
+	@PrePersist
+	private void prePersist() {
+		if (uuidPublic == null) {
+			uuidPublic = UUID.randomUUID();
+		}
 	}
 
 }
