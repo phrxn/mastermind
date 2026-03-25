@@ -1,7 +1,7 @@
 
 :root {
   color-scheme: dark;
-  --site-max-width: 1024px;
+  --site-max-width: 1150px;
   --font-body: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   --font-display: "Trebuchet MS", "Arial Narrow", "Segoe UI", Arial, sans-serif;
   --bg: #080b10;
@@ -789,7 +789,7 @@ p {
   flex-wrap: wrap;
   justify-content: end;
   gap: 0.35rem;
-  max-width: 5rem;
+  max-width: 8rem;
 }
 
 .tip {
@@ -940,7 +940,7 @@ img.smooth-board {
   flex-wrap: wrap;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1150px) {
   .auth-layout,
   .app-shell {
     max-width: var(--site-max-width);
